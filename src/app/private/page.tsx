@@ -10,6 +10,9 @@ export default async function PrivatePage() {
     redirect('/auth/login')
   }
   return (
-    <p>Hello, {data?.user?.email}</p>
+    <>
+      <p>Hello, {data.user.email}</p>
+      <pre>{JSON.stringify(data.user, null, 2)}</pre>
+    </>
   )
 }

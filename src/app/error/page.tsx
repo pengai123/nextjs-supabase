@@ -1,3 +1,3 @@
 export default function ErrorPage() {
-  return <p>Sorry, something went wrong</p>
+  return <p className="flex-1 flex justify-center items-center">Sorry, something went wrong</p>
 }

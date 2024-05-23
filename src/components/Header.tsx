@@ -16,7 +16,7 @@ export default async function Header() {
         <Link href="/" className="text-lg font-semibold">Logo</Link>
         <NavLinks />
         <div className="flex items-center gap-2">
-          {data?.user ? <><p className="text-sm text-secondary-foreground">{data?.user?.email}</p><form action={signOut}><Button size="sm" type="submit">Log Out</Button></form></> : <Button size="sm" asChild><Link href="/auth/login">Sign In</Link></Button>}
+          {data?.user ? <><p className="text-sm">{data?.user?.email}</p><form action={signOut}><Button size="sm" type="submit">Log Out</Button></form></> : <Button size="sm" asChild><Link href="/auth/login">Sign In</Link></Button>}
           <ThemeToggle />
           <Button variant="ghost" size="icon" className="sm:hidden">
             <HamburgerMenuIcon className="h-[1.2rem] w-[1.2rem]" />
