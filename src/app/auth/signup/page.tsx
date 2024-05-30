@@ -1,8 +1,8 @@
 "use client"
-import { login } from '@/app/auth/actions'
+import { signup } from '@/app/auth/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { loginFormSchema, TloginFormData } from "@/lib/zodSchemas"
+import { signupFormSchema, TsignupFormData } from "@/lib/zodSchemas"
 import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
 import {
@@ -23,21 +23,21 @@ import {
 import { useState } from "react"
 import Link from "next/link"
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
-  const form = useForm<TloginFormData>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<TsignupFormData>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   })
-  const onSubmit = async (values: TloginFormData) => {
+  const onSubmit = async (values: TsignupFormData) => {
     setErrorMsg("")
     setIsLoading(true)
     try {
-      const res = await login(values)
+      const res = await signup(values)
       if (res?.error) {
         setErrorMsg(res?.error)
       }
@@ -51,8 +51,8 @@ export default function LoginPage() {
     <main className='flex-1 flex justify-center items-center'>
       <Card className="w-[350px] min-h-96">
         <CardHeader>
-          <CardTitle className="text-xl">Log In</CardTitle>
-          <CardDescription>Log in to your account to stay connected and make the most of your experience.</CardDescription>
+          <CardTitle className="text-xl">Sign Up</CardTitle>
+          <CardDescription>Sign up to stay connected and make the most of your experience.</CardDescription>
         </CardHeader>
         <CardContent >
           <Form {...form}>
@@ -89,9 +89,25 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>LOG IN</Button>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Confirm Password" type="password" {...field} />
+                    </FormControl>
+                    {/* <FormDescription>
+                      This is your password.
+                    </FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isLoading}>SIGN UP</Button>
               <p className="text-sm text-destructive font-medium text-center">{errorMsg}</p>
-              <p className='mt-4 text-xs text-right'>Don't have an account? <Link className='text-blue-500 underline' href="/auth/signup">Sign up</Link> now.</p>
+              <p className='mt-4 text-xs text-right'>Already have an account? <Link className='text-blue-500 underline' href="/auth/login">Log in</Link> now.</p>
             </form>
           </Form>
         </CardContent>
