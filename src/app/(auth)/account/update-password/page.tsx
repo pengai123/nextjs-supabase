@@ -1,5 +1,5 @@
 "use client"
-// import { updatePassword } from '@/app/(auth)/actions'
+import { updatePassword } from '@/app/(auth)/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { updatePasswordFormSchema, TupdatePasswordFormData } from "@/lib/zodSchemas"
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form"
 import Link from "next/link"
 
-export default function updatePasswordPage() {
+export default function UpdatePasswordPage() {
   const router = useRouter()
   const supabase = createClient()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -44,14 +44,12 @@ export default function updatePasswordPage() {
     setMessage("")
     setIsLoading(true)
     try {
-      await supabase.auth.updateUser({ password: values.newPassword })
-      router.push("/success")
+      await updatePassword({ password: values.newPassword })
     } catch (error: any) {
       console.log('error:', error)
       setMessage(error.message)
     }
     setIsLoading(false)
-
   }
 
   const checkAuth = async () => {

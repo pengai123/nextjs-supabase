@@ -94,3 +94,17 @@ export async function resetPasswordForEmail(email: string) {
     throw new Error(error.message)
   }
 }
+
+export async function updatePassword(newPwd: { password: string }) {
+  const supabase = createClient()
+
+  const { error } = await supabase.auth.updateUser(newPwd)
+
+  if (error) {
+    console.log('error:', error.message)
+    throw new Error(error.message)
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/success')
+}
