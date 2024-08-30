@@ -6,8 +6,9 @@ import { createClient } from '@/utils/supabase/server'
 import { TloginFormData, TsignupFormData } from "@/lib/zodSchemas"
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
-const supabase = createClient()
+
 export async function login(data: TloginFormData) {
+  const supabase = createClient()
   // type-casting here for convenience
   // in practice, you should validate your inputs
   // const data = {
@@ -27,6 +28,7 @@ export async function login(data: TloginFormData) {
 }
 
 export async function signup(data: TsignupFormData) {
+  const supabase = createClient()
   // type-casting here for convenience
   // in practice, you should validate your inputs
   // const data = {
@@ -57,6 +59,7 @@ export async function signup(data: TsignupFormData) {
 }
 
 export async function signOut() {
+  const supabase = createClient()
   const { error } = await supabase.auth.signOut()
 
   if (error) {
@@ -69,6 +72,7 @@ export async function signOut() {
 }
 
 export async function resetPasswordForEmail(email: string) {
+  const supabase = createClient()
   const user = await prisma.profile.findUnique({
     where: { email }
   })
@@ -90,6 +94,7 @@ export async function resetPasswordForEmail(email: string) {
 }
 
 export async function updatePassword(newPwd: { password: string }) {
+  const supabase = createClient()
   const { error } = await supabase.auth.updateUser(newPwd)
 
   if (error) {
@@ -102,6 +107,7 @@ export async function updatePassword(newPwd: { password: string }) {
 }
 
 export async function validateAuth() {
+  const supabase = createClient()
   const { data, error } = await supabase.auth.getUser()
 
   if (error || !data?.user) {
