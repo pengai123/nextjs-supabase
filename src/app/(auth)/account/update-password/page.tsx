@@ -1,13 +1,11 @@
 "use client"
-import { updatePassword } from '@/app/(auth)/actions'
+import { validateAuth, updatePassword } from '@/app/(auth)/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { updatePasswordFormSchema, TupdatePasswordFormData } from "@/lib/zodSchemas"
 import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
-import { createClient } from '@/utils/supabase/client'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -26,10 +24,7 @@ import {
 import Link from "next/link"
 
 export default function UpdatePasswordPage() {
-  const router = useRouter()
-  const supabase = createClient()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState("")
 
   const form = useForm<TupdatePasswordFormData>({
@@ -39,27 +34,21 @@ export default function UpdatePasswordPage() {
       confirmNewPassword: "",
     },
   })
+  const { isSubmitting } = form.formState
   const onSubmit = async (values: TupdatePasswordFormData) => {
     console.log('values:', values)
     setMessage("")
-    setIsLoading(true)
     try {
       await updatePassword({ password: values.newPassword })
     } catch (error: any) {
       console.log('error:', error)
       setMessage(error.message)
     }
-    setIsLoading(false)
   }
 
   const checkAuth = async () => {
-    const { data, error } = await supabase.auth.getUser()
-
-    if (error || !data?.user) {
-      router.push('/login')
-    }
-    console.log("user:", data?.user)
-    setIsLoggedIn(true)
+    const res = await validateAuth()
+    if (res) { setIsLoggedIn(true) }
   }
 
   useEffect(() => {
@@ -110,7 +99,7 @@ export default function UpdatePasswordPage() {
                   </FormItem>
                 )}
               />
-              <Button className='mt-6' type="submit" disabled={isLoading}>SUBMIT</Button>
+              <Button className='mt-6' type="submit" disabled={isSubmitting}>SUBMIT</Button>
               {message && <p className='text-sm text-red-600 text-center p-2 bg-red-300/20'>{message}</p>}
               <p className='mt-4 text-xs text-right'>Remember your password? <Link className='text-blue-500 underline' href="/login">Log in</Link> now.</p>
             </form>

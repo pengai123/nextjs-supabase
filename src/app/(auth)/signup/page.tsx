@@ -24,7 +24,6 @@ import { useState } from "react"
 import Link from "next/link"
 
 export default function SignupPage() {
-  const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const form = useForm<TsignupFormData>({
     resolver: zodResolver(signupFormSchema),
@@ -34,15 +33,17 @@ export default function SignupPage() {
       confirmPassword: "",
     },
   })
+  const { isSubmitting } = form.formState
   const onSubmit = async (values: TsignupFormData) => {
     setErrorMsg("")
-    setIsLoading(true)
     try {
       const res = await signup(values)
+      if (res.error) {
+        setErrorMsg(res.error)
+      }
     } catch (error: any) {
       setErrorMsg(error.message)
     }
-    setIsLoading(false)
   }
 
   return (
@@ -103,7 +104,7 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>SIGN UP</Button>
+              <Button type="submit" disabled={isSubmitting}>SIGN UP</Button>
               {errorMsg && <p className="text-sm text-red-600 font-medium text-center p-2 bg-red-200/20">{errorMsg}</p>}
               <p className='mt-4 text-xs text-right'>Already have an account? <Link className='text-blue-500 underline' href="/login">Log in</Link> now.</p>
             </form>

@@ -23,32 +23,30 @@ import {
 } from "@/components/ui/form"
 import Link from "next/link"
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function ResetPasswordPage() {
-  const router = useRouter()
   const [message, setMessage] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<TforgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordFormSchema),
     defaultValues: {
       email: "",
     },
   })
+  const { isSubmitting } = form.formState
   const onSubmit = async (values: TforgotPasswordFormData) => {
     setMessage("")
-    setIsLoading(true)
     const { email } = values
     console.log('email:', email)
 
     try {
-      await resetPasswordForEmail(email)
-      router.push("/success")
+      const res = await resetPasswordForEmail(email)
+      if (res.error) {
+        setMessage(res.error)
+      }
     } catch (error: any) {
       console.log('error:', error.message)
       setMessage(error.message)
     }
-    setIsLoading(false)
   }
 
   return (
@@ -77,7 +75,7 @@ export default function ResetPasswordPage() {
                   </FormItem>
                 )}
               />
-              <Button className='mt-6' type="submit" disabled={isLoading}>CONTINUE</Button>
+              <Button className='mt-6' type="submit" disabled={isSubmitting}>CONTINUE</Button>
               {message && <p className='text-sm text-red-600 text-center p-2 bg-red-300/20'>{message}</p>}
               <p className='mt-4 text-xs text-right'>Remember your password? <Link className='text-blue-500 underline' href="/login">Log in</Link> now.</p>
             </form>

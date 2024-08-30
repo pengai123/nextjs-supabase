@@ -24,7 +24,6 @@ import {
 import { useState } from "react"
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const form = useForm<TloginFormData>({
     resolver: zodResolver(loginFormSchema),
@@ -33,16 +32,18 @@ export default function LoginPage() {
       password: "",
     },
   })
+  const { isSubmitting } = form.formState
   const onSubmit = async (values: TloginFormData) => {
     setErrorMsg("")
-    setIsLoading(true)
     try {
-      await login(values)
+      const res = await login(values)
+      if (res.error) {
+        setErrorMsg(res.error)
+      }
     } catch (error: any) {
       console.error(error)
       setErrorMsg(error.message)
     }
-    setIsLoading(false)
   }
 
   return (
@@ -90,7 +91,7 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>LOG IN</Button>
+              <Button type="submit" disabled={isSubmitting}>LOG IN</Button>
               {errorMsg && <p className="text-sm text-red-600 font-medium text-center p-2 bg-red-200/20">{errorMsg}</p>}
               <p className='mt-4 text-xs text-right'>Don't have an account? <Link className='text-blue-500 underline' href="/signup">Sign up</Link> now.</p>
             </form>
