@@ -14,7 +14,7 @@ export default async function Dashboard() {
   const { data, error } = await supabase.auth.getUser()
 
   if (error || !data?.user) {
-    redirect('/auth/login')
+    redirect('/login')
   }
 
   const user = await prisma.profile.findUnique({
@@ -28,9 +28,9 @@ export default async function Dashboard() {
   }
 
   return (
-    <>
+    <main className='flex-1'>
       <div className="text-md">Admin Dashboard</div>
       <pre>{JSON.stringify(user, null, 2)}</pre>
-    </>
+    </main>
   )
 }

@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { TloginFormData, TsignupFormData } from "@/lib/zodSchemas"
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
 export async function login(data: TloginFormData) {
   const supabase = createClient()
@@ -19,7 +21,7 @@ export async function login(data: TloginFormData) {
 
   if (error) {
     console.log('error:', error.message)
-    return { error: error.message }
+    throw new Error(error.message)
   }
 
   revalidatePath('/', 'layout')
@@ -36,12 +38,23 @@ export async function signup(data: TsignupFormData) {
   //   password: formData.get('password') as string,
   // }
   console.log('data:', data)
+
+  const user = await prisma.profile.findUnique({
+    where: { email: data.email }
+  })
+
+  console.log('user:', user)
+
+  if (user) {
+    throw new Error("This account already exists.")
+  }
+
   const { error } = await supabase.auth.signUp(data)
 
 
   if (error) {
-    console.log('error:', error.message)
-    return { error: error.message }
+    console.log('error:', error)
+    throw new Error(error.message)
   }
 
   revalidatePath('/', 'layout')
@@ -59,4 +72,25 @@ export async function signOut() {
 
   revalidatePath('/', 'layout')
   redirect('/')
+}
+
+export async function resetPasswordForEmail(email: string) {
+  const supabase = createClient()
+
+  const user = await prisma.profile.findUnique({
+    where: { email }
+  })
+
+  console.log('user:', user)
+
+  if (!user) {
+    throw new Error("This account does not exist.")
+  }
+
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email)
+
+  if (error) {
+    console.log('error:', error)
+    throw new Error(error.message)
+  }
 }

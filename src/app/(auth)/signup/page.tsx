@@ -1,5 +1,5 @@
 "use client"
-import { signup } from '@/app/auth/actions'
+import { signup } from '@/app/(auth)/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signupFormSchema, TsignupFormData } from "@/lib/zodSchemas"
@@ -31,6 +31,7 @@ export default function SignupPage() {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   })
   const onSubmit = async (values: TsignupFormData) => {
@@ -38,17 +39,14 @@ export default function SignupPage() {
     setIsLoading(true)
     try {
       const res = await signup(values)
-      if (res?.error) {
-        setErrorMsg(res?.error)
-      }
-    } catch (err) {
-      console.error(err)
+    } catch (error: any) {
+      setErrorMsg(error.message)
     }
     setIsLoading(false)
   }
 
   return (
-    <main className='flex-1 flex justify-center items-center'>
+    <main>
       <Card className="w-[350px] min-h-96">
         <CardHeader>
           <CardTitle className="text-xl">Sign Up</CardTitle>
@@ -106,8 +104,8 @@ export default function SignupPage() {
                 )}
               />
               <Button type="submit" disabled={isLoading}>SIGN UP</Button>
-              <p className="text-sm text-destructive font-medium text-center">{errorMsg}</p>
-              <p className='mt-4 text-xs text-right'>Already have an account? <Link className='text-blue-500 underline' href="/auth/login">Log in</Link> now.</p>
+              {errorMsg && <p className="text-sm text-red-600 font-medium text-center p-2 bg-red-200/20">{errorMsg}</p>}
+              <p className='mt-4 text-xs text-right'>Already have an account? <Link className='text-blue-500 underline' href="/login">Log in</Link> now.</p>
             </form>
           </Form>
         </CardContent>

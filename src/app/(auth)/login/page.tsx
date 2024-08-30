@@ -1,10 +1,11 @@
 "use client"
-import { login } from '@/app/auth/actions'
+import { login } from '@/app/(auth)/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { loginFormSchema, TloginFormData } from "@/lib/zodSchemas"
 import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 import {
   Card,
   CardContent,
@@ -21,7 +22,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useState } from "react"
-import Link from "next/link"
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -37,18 +37,16 @@ export default function LoginPage() {
     setErrorMsg("")
     setIsLoading(true)
     try {
-      const res = await login(values)
-      if (res?.error) {
-        setErrorMsg(res?.error)
-      }
-    } catch (err) {
-      console.error(err)
+      await login(values)
+    } catch (error: any) {
+      console.error(error)
+      setErrorMsg(error.message)
     }
     setIsLoading(false)
   }
 
   return (
-    <main className='flex-1 flex justify-center items-center'>
+    <main>
       <Card className="w-[350px] min-h-96">
         <CardHeader>
           <CardTitle className="text-xl">Log In</CardTitle>
@@ -78,7 +76,10 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <div className='flex items-center'>
+                      <FormLabel>Password</FormLabel>
+                      <Link href="/forgot-password" className='ml-auto text-xs underline'>Forgot your password?</Link>
+                    </div>
                     <FormControl>
                       <Input placeholder="Password" type="password" {...field} />
                     </FormControl>
@@ -90,8 +91,8 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" disabled={isLoading}>LOG IN</Button>
-              <p className="text-sm text-destructive font-medium text-center">{errorMsg}</p>
-              <p className='mt-4 text-xs text-right'>Don't have an account? <Link className='text-blue-500 underline' href="/auth/signup">Sign up</Link> now.</p>
+              {errorMsg && <p className="text-sm text-red-600 font-medium text-center p-2 bg-red-200/20">{errorMsg}</p>}
+              <p className='mt-4 text-xs text-right'>Don't have an account? <Link className='text-blue-500 underline' href="/signup">Sign up</Link> now.</p>
             </form>
           </Form>
         </CardContent>
