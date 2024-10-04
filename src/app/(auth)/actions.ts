@@ -4,8 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { TloginFormData, TsignupFormData } from "@/lib/zodSchemas"
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 export async function login(data: TloginFormData) {
   const supabase = createClient()

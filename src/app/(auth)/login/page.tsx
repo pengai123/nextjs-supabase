@@ -37,7 +37,7 @@ export default function LoginPage() {
     setErrorMsg("")
     try {
       const res = await login(values)
-      if (res.error) {
+      if (res?.error) {
         setErrorMsg(res.error)
       }
     } catch (error: any) {
@@ -93,7 +93,7 @@ export default function LoginPage() {
               />
               <Button type="submit" disabled={isSubmitting}>LOG IN</Button>
               {errorMsg && <p className="text-sm text-red-600 font-medium text-center p-2 bg-red-200/20">{errorMsg}</p>}
-              <p className='mt-4 text-xs text-right'>Don't have an account? <Link className='text-blue-500 underline' href="/signup">Sign up</Link> now.</p>
+              <p className='mt-4 text-xs text-right'>Don't have an account? <Link className='text-custom-blue underline' href="/signup">Sign up</Link> now.</p>
             </form>
           </Form>
         </CardContent>

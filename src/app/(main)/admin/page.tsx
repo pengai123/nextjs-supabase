@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
@@ -23,7 +22,7 @@ export default async function Dashboard() {
     }
   })
 
-  if (user.role !== "ADMIN") {
+  if (user?.role !== "ADMIN") {
     redirect('/')
   }
 

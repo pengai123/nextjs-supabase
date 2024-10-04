@@ -101,7 +101,7 @@ export default function UpdatePasswordPage() {
               />
               <Button className='mt-6' type="submit" disabled={isSubmitting}>SUBMIT</Button>
               {message && <p className='text-sm text-red-600 text-center p-2 bg-red-300/20'>{message}</p>}
-              <p className='mt-4 text-xs text-right'>Remember your password? <Link className='text-blue-500 underline' href="/login">Log in</Link> now.</p>
+              <p className='mt-4 text-xs text-right'>Remember your password? <Link className='text-custom-blue underline' href="/login">Log in</Link> now.</p>
             </form>
           </Form>
         </CardContent>

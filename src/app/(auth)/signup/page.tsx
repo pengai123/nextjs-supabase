@@ -38,7 +38,7 @@ export default function SignupPage() {
     setErrorMsg("")
     try {
       const res = await signup(values)
-      if (res.error) {
+      if (res?.error) {
         setErrorMsg(res.error)
       }
     } catch (error: any) {
@@ -106,7 +106,7 @@ export default function SignupPage() {
               />
               <Button type="submit" disabled={isSubmitting}>SIGN UP</Button>
               {errorMsg && <p className="text-sm text-red-600 font-medium text-center p-2 bg-red-200/20">{errorMsg}</p>}
-              <p className='mt-4 text-xs text-right'>Already have an account? <Link className='text-blue-500 underline' href="/login">Log in</Link> now.</p>
+              <p className='mt-4 text-xs text-right'>Already have an account? <Link className='text-custom-blue underline' href="/login">Log in</Link> now.</p>
             </form>
           </Form>
         </CardContent>
