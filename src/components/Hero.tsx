@@ -5,8 +5,8 @@ import Image from 'next/image'
 
 export default function Hero() {
   return (
-    <section className="py-16 lg:py-30 bg-[url('/abstract-bg1.jpg')] bg-cover bg-center">
-      <div className="container mx-auto grid grid-cols-1 gap-8 items-center lg:grid-cols-2">
+    <section className="py-16 lg:py-32 bg-[url('/abstract-bg1.jpg')] bg-cover bg-center">
+      <div className="container mx-auto grid grid-cols-1 gap-8 items-center lg:grid-cols-2 justify-items-center">
         <div className="flex gap-4 flex-col">
           <div>
             <Badge variant="outline" className="text-custom-blue">We&apos;re live!</Badge>
@@ -28,7 +28,7 @@ export default function Hero() {
             </Button>
           </div>
         </div>
-        <div className="bg-muted rounded-md aspect-square relative max-w-[625px]">
+        <div className="bg-muted rounded-md overflow-hidden aspect-square relative w-full max-w-[625px]">
           <Image
             src="/hero.jpg"
             alt="hero"

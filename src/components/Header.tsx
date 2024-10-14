@@ -9,7 +9,7 @@ import MobileMenu from "./MobileMenu"
 
 const navItems = [
   { name: "Home", href: "/" },
-  { name: "Product", href: "/product" },
+  { name: "Services", href: "/services" },
   { name: "Admin", href: "/admin" },
   { name: "Private", href: "/private" },
 ]

@@ -25,7 +25,8 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          // DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "#60a5fa",  // change primary default color
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
@@ -53,7 +54,7 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         custom: {
-          DEFAULT: '#60a5fa',
+          DEFAULT: '#60a5fa', // add custom colors
           blue: '#60a5fa',
         }
       },

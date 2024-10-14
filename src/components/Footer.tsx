@@ -9,24 +9,24 @@ export default function Footer() {
       description: "",
     },
     {
-      title: "Product",
+      title: "Services",
       description: "Managing a small business today is already tough.",
       items: [
         {
-          title: "Reports",
-          href: "/reports",
+          title: "Website design",
+          href: "/services",
         },
         {
-          title: "Statistics",
-          href: "/statistics",
+          title: "Website hosting",
+          href: "/services",
         },
         {
-          title: "Dashboards",
-          href: "/dashboards",
+          title: "Domain setup",
+          href: "/services",
         },
         {
-          title: "Recordings",
-          href: "/recordings",
+          title: "Business Email setup",
+          href: "/services",
         },
       ],
     },
@@ -38,14 +38,7 @@ export default function Footer() {
           title: "About us",
           href: "/about",
         },
-        {
-          title: "Fundraising",
-          href: "/fundraising",
-        },
-        {
-          title: "Investors",
-          href: "/investors",
-        },
+
         {
           title: "Contact us",
           href: "/contact",
@@ -53,6 +46,8 @@ export default function Footer() {
       ],
     },
   ];
+
+  const year = new Date().getFullYear()
 
   return (
     <section className="w-full py-8 bg-foreground text-background">
@@ -66,17 +61,17 @@ export default function Footer() {
               <Link href="/">
                 <Image src="/logo.png" alt="logo" width={100} height={100} />
               </Link>
-              <p className="max-w-lg leading-relaxed tracking-tight text-background/75 text-left">
+              <p className="max-w-lg leading-relaxed tracking-tight text-background/65 text-left">
                 Connect you to the web, one hotlink at a time.
               </p>
             </div>
             <div className="flex gap-20 flex-row">
-              <div className="flex flex-col text-sm max-w-lg leading-relaxed tracking-tight text-background/75 text-left">
+              {/* <div className="flex flex-col text-sm max-w-lg leading-relaxed tracking-tight text-background/65 text-left">
                 <p>123 Example St</p>
                 <p>City</p>
                 <p>AZ 123123</p>
-              </div>
-              <div className="flex flex-col text-sm max-w-lg leading-relaxed tracking-tight text-background/75 text-left">
+              </div> */}
+              <div className="flex flex-col text-sm max-w-lg leading-relaxed tracking-tight text-background/65 text-left">
                 <Link href="/" className="hover:text-custom-blue">Terms of service</Link>
                 <Link href="/" className="hover:text-custom-blue">Privacy Policy</Link>
               </div>
@@ -106,7 +101,7 @@ export default function Footer() {
                         href={subItem.href}
                         className="flex justify-between items-center"
                       >
-                        <span className="text-background/75 text-sm hover:text-custom-blue">
+                        <span className="text-background/65 text-sm hover:text-custom-blue">
                           {subItem.title}
                         </span>
                       </Link>
@@ -116,8 +111,9 @@ export default function Footer() {
             ))}
           </div>
         </div>
-        <div className="mt-8 border-t pt-4 border-muted-foreground text-sm text-muted-foreground text-center">
-          © 2024 Powered By <Link href="https://www.hotlinkstudio.com/" target="_blank" className="underline">Hotlink Studio</Link>.
+        <div className="mt-8 border-t pt-4 border-muted-foreground text-sm text-muted-foreground flex justify-center">
+          <p>© {year} <Link href="/" className="hover:underline">Hotlink Studio</Link>. All rights reserved.</p>
+          {/* <p>Powered By <Link href="https://www.hotlinkstudio.com/" target="_blank" className="hover:underline">Hotlink Studio</Link>.</p> */}
         </div>
       </div>
     </section>
