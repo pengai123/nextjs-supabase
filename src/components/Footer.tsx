@@ -35,10 +35,13 @@ export default function Footer() {
       description: "Managing a small business today is already tough.",
       items: [
         {
+          title: "FAQ",
+          href: "/faq",
+        },
+        {
           title: "About us",
           href: "/about",
         },
-
         {
           title: "Contact us",
           href: "/contact",

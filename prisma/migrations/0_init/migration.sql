@@ -14,7 +14,13 @@ CREATE TYPE "auth"."code_challenge_method" AS ENUM ('s256', 'plain');
 CREATE TYPE "auth"."factor_status" AS ENUM ('unverified', 'verified');
 
 -- CreateEnum
-CREATE TYPE "auth"."factor_type" AS ENUM ('totp', 'webauthn');
+CREATE TYPE "auth"."factor_type" AS ENUM ('totp', 'webauthn', 'phone');
+
+-- CreateEnum
+CREATE TYPE "auth"."one_time_token_type" AS ENUM ('confirmation_token', 'reauthentication_token', 'recovery_token', 'email_change_token_new', 'email_change_token_current', 'phone_change_token');
+
+-- CreateEnum
+CREATE TYPE "public"."Role" AS ENUM ('USER', 'ADMIN');
 
 -- CreateTable
 CREATE TABLE "auth"."audit_log_entries" (
@@ -54,7 +60,7 @@ CREATE TABLE "auth"."identities" (
     "last_sign_in_at" TIMESTAMPTZ(6),
     "created_at" TIMESTAMPTZ(6),
     "updated_at" TIMESTAMPTZ(6),
-    -- "email" TEXT DEFAULT lower((identity_data->>'email'::text)),
+    -- "email" TEXT DEFAULT lower((identity_data ->> 'email'::text)),
     "email" TEXT GENERATED ALWAYS AS (lower((identity_data->>'email'::text))) STORED,
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
 
@@ -90,6 +96,7 @@ CREATE TABLE "auth"."mfa_challenges" (
     "created_at" TIMESTAMPTZ(6) NOT NULL,
     "verified_at" TIMESTAMPTZ(6),
     "ip_address" INET NOT NULL,
+    "otp_code" TEXT,
 
     CONSTRAINT "mfa_challenges_pkey" PRIMARY KEY ("id")
 );
@@ -104,8 +111,23 @@ CREATE TABLE "auth"."mfa_factors" (
     "created_at" TIMESTAMPTZ(6) NOT NULL,
     "updated_at" TIMESTAMPTZ(6) NOT NULL,
     "secret" TEXT,
+    "phone" TEXT,
+    "last_challenged_at" TIMESTAMPTZ(6),
 
     CONSTRAINT "mfa_factors_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "auth"."one_time_tokens" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "token_type" "auth"."one_time_token_type" NOT NULL,
+    "token_hash" TEXT NOT NULL,
+    "relates_to" TEXT NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "one_time_tokens_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -239,6 +261,17 @@ CREATE TABLE "auth"."users" (
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "public"."profiles" (
+    "id" UUID NOT NULL,
+    "email" TEXT NOT NULL,
+    "role" "public"."Role" NOT NULL DEFAULT 'USER',
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6),
+
+    CONSTRAINT "profiles_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE INDEX "audit_logs_instance_id_idx" ON "auth"."audit_log_entries"("instance_id");
 
@@ -267,10 +300,25 @@ CREATE UNIQUE INDEX "mfa_amr_claims_session_id_authentication_method_pkey" ON "a
 CREATE INDEX "mfa_challenge_created_at_idx" ON "auth"."mfa_challenges"("created_at" DESC);
 
 -- CreateIndex
+CREATE UNIQUE INDEX "mfa_factors_last_challenged_at_key" ON "auth"."mfa_factors"("last_challenged_at");
+
+-- CreateIndex
 CREATE INDEX "factor_id_created_at_idx" ON "auth"."mfa_factors"("user_id", "created_at");
 
 -- CreateIndex
 CREATE INDEX "mfa_factors_user_id_idx" ON "auth"."mfa_factors"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "unique_phone_factor_per_user" ON "auth"."mfa_factors"("user_id", "phone");
+
+-- CreateIndex
+CREATE INDEX "one_time_tokens_relates_to_hash_idx" ON "auth"."one_time_tokens" USING HASH ("relates_to");
+
+-- CreateIndex
+CREATE INDEX "one_time_tokens_token_hash_hash_idx" ON "auth"."one_time_tokens" USING HASH ("token_hash");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "one_time_tokens_user_id_token_type_key" ON "auth"."one_time_tokens"("user_id", "token_type");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "refresh_tokens_token_unique" ON "auth"."refresh_tokens"("token");
@@ -326,6 +374,12 @@ CREATE INDEX "users_instance_id_idx" ON "auth"."users"("instance_id");
 -- CreateIndex
 CREATE INDEX "users_is_anonymous_idx" ON "auth"."users"("is_anonymous");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "profiles_id_key" ON "public"."profiles"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "profiles_email_key" ON "public"."profiles"("email");
+
 -- AddForeignKey
 ALTER TABLE "auth"."identities" ADD CONSTRAINT "identities_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
@@ -337,6 +391,9 @@ ALTER TABLE "auth"."mfa_challenges" ADD CONSTRAINT "mfa_challenges_auth_factor_i
 
 -- AddForeignKey
 ALTER TABLE "auth"."mfa_factors" ADD CONSTRAINT "mfa_factors_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "auth"."one_time_tokens" ADD CONSTRAINT "one_time_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "auth"."refresh_tokens" ADD CONSTRAINT "refresh_tokens_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "auth"."sessions"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
@@ -356,12 +413,3 @@ ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY
 -- AddForeignKey
 ALTER TABLE "auth"."sso_domains" ADD CONSTRAINT "sso_domains_sso_provider_id_fkey" FOREIGN KEY ("sso_provider_id") REFERENCES "auth"."sso_providers"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
-grant usage on schema public to postgres, anon, authenticated, service_role;
-
-grant all privileges on all tables in schema public to postgres, anon, authenticated, service_role;
-grant all privileges on all functions in schema public to postgres, anon, authenticated, service_role;
-grant all privileges on all sequences in schema public to postgres, anon, authenticated, service_role;
-
-alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;
-alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;
-alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;

@@ -10,6 +10,7 @@ datasource db {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model audit_log_entries {
   instance_id String?   @db.Uuid
   id          String    @id @db.Uuid
@@ -22,6 +23,7 @@ model audit_log_entries {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model flow_state {
   id                     String                @id @db.Uuid
   user_id                String?               @db.Uuid
@@ -44,6 +46,7 @@ model flow_state {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model identities {
   provider_id     String
   user_id         String    @db.Uuid
@@ -63,6 +66,7 @@ model identities {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model instances {
   id              String    @id @db.Uuid
   uuid            String?   @db.Uuid
@@ -74,6 +78,7 @@ model instances {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model mfa_amr_claims {
   session_id            String   @db.Uuid
   created_at            DateTime @db.Timestamptz(6)
@@ -87,12 +92,14 @@ model mfa_amr_claims {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model mfa_challenges {
   id          String      @id @db.Uuid
   factor_id   String      @db.Uuid
   created_at  DateTime    @db.Timestamptz(6)
   verified_at DateTime?   @db.Timestamptz(6)
   ip_address  String      @db.Inet
+  otp_code    String?
   mfa_factors mfa_factors @relation(fields: [factor_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "mfa_challenges_auth_factor_id_fkey")
 
   @@index([created_at(sort: Desc)], map: "mfa_challenge_created_at_idx")
@@ -100,24 +107,47 @@ model mfa_challenges {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model mfa_factors {
-  id             String           @id @db.Uuid
-  user_id        String           @db.Uuid
-  friendly_name  String?
-  factor_type    factor_type
-  status         factor_status
-  created_at     DateTime         @db.Timestamptz(6)
-  updated_at     DateTime         @db.Timestamptz(6)
-  secret         String?
-  mfa_challenges mfa_challenges[]
-  users          users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                 String           @id @db.Uuid
+  user_id            String           @db.Uuid
+  friendly_name      String?
+  factor_type        factor_type
+  status             factor_status
+  created_at         DateTime         @db.Timestamptz(6)
+  updated_at         DateTime         @db.Timestamptz(6)
+  secret             String?
+  phone              String?
+  last_challenged_at DateTime?        @unique @db.Timestamptz(6)
+  mfa_challenges     mfa_challenges[]
+  users              users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
+  @@unique([user_id, phone], map: "unique_phone_factor_per_user")
   @@index([user_id, created_at], map: "factor_id_created_at_idx")
   @@index([user_id])
   @@schema("auth")
 }
 
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model one_time_tokens {
+  id         String              @id @db.Uuid
+  user_id    String              @db.Uuid
+  token_type one_time_token_type
+  token_hash String
+  relates_to String
+  created_at DateTime            @default(now()) @db.Timestamp(6)
+  updated_at DateTime            @default(now()) @db.Timestamp(6)
+  users      users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, token_type])
+  @@index([relates_to], map: "one_time_tokens_relates_to_hash_idx", type: Hash)
+  @@index([token_hash], map: "one_time_tokens_token_hash_hash_idx", type: Hash)
+  @@schema("auth")
+}
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model refresh_tokens {
   instance_id String?   @db.Uuid
   id          BigInt    @id @default(autoincrement())
@@ -140,6 +170,7 @@ model refresh_tokens {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model saml_providers {
   id                String        @id @db.Uuid
   sso_provider_id   String        @db.Uuid
@@ -158,6 +189,7 @@ model saml_providers {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model saml_relay_states {
   id              String        @id @db.Uuid
   sso_provider_id String        @db.Uuid
@@ -177,6 +209,7 @@ model saml_relay_states {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model schema_migrations {
   version String @id @db.VarChar(255)
 
@@ -184,6 +217,7 @@ model schema_migrations {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sessions {
   id             String           @id @db.Uuid
   user_id        String           @db.Uuid
@@ -208,6 +242,7 @@ model sessions {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model sso_domains {
   id              String        @id @db.Uuid
@@ -223,6 +258,7 @@ model sso_domains {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model sso_providers {
   id                String              @id @db.Uuid
@@ -238,45 +274,47 @@ model sso_providers {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model users {
-  instance_id                 String?       @db.Uuid
-  id                          String        @id @db.Uuid
-  aud                         String?       @db.VarChar(255)
-  role                        String?       @db.VarChar(255)
-  email                       String?       @db.VarChar(255)
-  encrypted_password          String?       @db.VarChar(255)
-  email_confirmed_at          DateTime?     @db.Timestamptz(6)
-  invited_at                  DateTime?     @db.Timestamptz(6)
-  confirmation_token          String?       @db.VarChar(255)
-  confirmation_sent_at        DateTime?     @db.Timestamptz(6)
-  recovery_token              String?       @db.VarChar(255)
-  recovery_sent_at            DateTime?     @db.Timestamptz(6)
-  email_change_token_new      String?       @db.VarChar(255)
-  email_change                String?       @db.VarChar(255)
-  email_change_sent_at        DateTime?     @db.Timestamptz(6)
-  last_sign_in_at             DateTime?     @db.Timestamptz(6)
+  instance_id                 String?           @db.Uuid
+  id                          String            @id @db.Uuid
+  aud                         String?           @db.VarChar(255)
+  role                        String?           @db.VarChar(255)
+  email                       String?           @db.VarChar(255)
+  encrypted_password          String?           @db.VarChar(255)
+  email_confirmed_at          DateTime?         @db.Timestamptz(6)
+  invited_at                  DateTime?         @db.Timestamptz(6)
+  confirmation_token          String?           @db.VarChar(255)
+  confirmation_sent_at        DateTime?         @db.Timestamptz(6)
+  recovery_token              String?           @db.VarChar(255)
+  recovery_sent_at            DateTime?         @db.Timestamptz(6)
+  email_change_token_new      String?           @db.VarChar(255)
+  email_change                String?           @db.VarChar(255)
+  email_change_sent_at        DateTime?         @db.Timestamptz(6)
+  last_sign_in_at             DateTime?         @db.Timestamptz(6)
   raw_app_meta_data           Json?
   raw_user_meta_data          Json?
   is_super_admin              Boolean?
-  created_at                  DateTime?     @db.Timestamptz(6)
-  updated_at                  DateTime?     @db.Timestamptz(6)
-  phone                       String?       @unique
-  phone_confirmed_at          DateTime?     @db.Timestamptz(6)
-  phone_change                String?       @default("")
-  phone_change_token          String?       @default("") @db.VarChar(255)
-  phone_change_sent_at        DateTime?     @db.Timestamptz(6)
-  confirmed_at                DateTime?     @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
-  email_change_token_current  String?       @default("") @db.VarChar(255)
-  email_change_confirm_status Int?          @default(0) @db.SmallInt
-  banned_until                DateTime?     @db.Timestamptz(6)
-  reauthentication_token      String?       @default("") @db.VarChar(255)
-  reauthentication_sent_at    DateTime?     @db.Timestamptz(6)
-  is_sso_user                 Boolean       @default(false)
-  deleted_at                  DateTime?     @db.Timestamptz(6)
-  is_anonymous                Boolean       @default(false)
+  created_at                  DateTime?         @db.Timestamptz(6)
+  updated_at                  DateTime?         @db.Timestamptz(6)
+  phone                       String?           @unique
+  phone_confirmed_at          DateTime?         @db.Timestamptz(6)
+  phone_change                String?           @default("")
+  phone_change_token          String?           @default("") @db.VarChar(255)
+  phone_change_sent_at        DateTime?         @db.Timestamptz(6)
+  confirmed_at                DateTime?         @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
+  email_change_token_current  String?           @default("") @db.VarChar(255)
+  email_change_confirm_status Int?              @default(0) @db.SmallInt
+  banned_until                DateTime?         @db.Timestamptz(6)
+  reauthentication_token      String?           @default("") @db.VarChar(255)
+  reauthentication_sent_at    DateTime?         @db.Timestamptz(6)
+  is_sso_user                 Boolean           @default(false)
+  deleted_at                  DateTime?         @db.Timestamptz(6)
+  is_anonymous                Boolean           @default(false)
   identities                  identities[]
   mfa_factors                 mfa_factors[]
+  one_time_tokens             one_time_tokens[]
   sessions                    sessions[]
 
   @@index([instance_id])
@@ -285,20 +323,11 @@ model users {
 }
 
 model Profile {
-  id         String    @id @unique @db.Uuid
-  email      String    @unique
-  role       Role      @default(USER)
-  created_at DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at DateTime? @updatedAt @db.Timestamptz(6)
+  id    String @id @unique @db.Uuid
+  email String @unique
+  role  Role   @default(USER)
 
   @@map("profiles")
-  @@schema("public")
-}
-
-enum Role {
-  USER
-  ADMIN
-
   @@schema("public")
 }
 
@@ -327,6 +356,25 @@ enum factor_status {
 enum factor_type {
   totp
   webauthn
+  phone
 
   @@schema("auth")
+}
+
+enum one_time_token_type {
+  confirmation_token
+  reauthentication_token
+  recovery_token
+  email_change_token_new
+  email_change_token_current
+  phone_change_token
+
+  @@schema("auth")
+}
+
+enum Role {
+  USER
+  ADMIN
+
+  @@schema("public")
 }

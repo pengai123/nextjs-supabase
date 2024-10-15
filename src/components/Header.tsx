@@ -12,6 +12,7 @@ const navItems = [
   { name: "Services", href: "/services" },
   { name: "Admin", href: "/admin" },
   { name: "Private", href: "/private" },
+  { name: "FAQ", href: "/faq" },
 ]
 
 export default async function Header() {
