@@ -31,7 +31,7 @@ export default function MobileMenu({ navItems }: { navItems: { name: string, hre
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block text-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-custom-blue hover:bg-gray-50"
+                  className="block text-center px-3 py-2 rounded-md text-base hover:text-custom-blue"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}

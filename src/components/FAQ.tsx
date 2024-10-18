@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     question: "What is included in your website design and development services?",
-    answer: "Our website design and development services include creating a fully customized website based on your business needs. This includes design layout, responsive design (mobile-friendly), user experience optimization, content integration, SEO setup, and more. We also offer ongoing maintenance and support to ensure your site runs smoothly."
+    answer: "Our website design and development services include creating a fully customized website based on your business needs. This includes design layout, responsive design (mobile-friendly), user experience optimization, content integration, and more. We also offer ongoing maintenance and support to ensure your site runs smoothly."
   },
   {
     question: "How long does it take to design and build a website?",
@@ -76,7 +76,7 @@ export default function FAQ() {
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, idx) => (
                 <AccordionItem key={faq.question} value={"index-" + idx}>
-                  <AccordionTrigger>
+                  <AccordionTrigger className="text-start">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent>

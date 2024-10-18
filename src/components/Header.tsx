@@ -3,21 +3,32 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./ThemeToggle"
 import NavLinks from './NavLinks'
 import { createClient } from '@/utils/supabase/server'
-import { signOut } from "@/app/(auth)/actions"
 import Image from 'next/image'
 import MobileMenu from "./MobileMenu"
+import UserMenu from "./UserMenu"
 
 const navItems = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/services" },
-  { name: "Admin", href: "/admin" },
-  { name: "Private", href: "/private" },
+  { name: "Contact", href: "/contact" },
   { name: "FAQ", href: "/faq" },
 ]
 
 export default async function Header() {
   const supabase = createClient()
   const { data, error } = await supabase.auth.getUser()
+  let isAdmin: boolean = false
+
+  if (data?.user) {
+    const user = await prisma.profile.findUnique({
+      where: {
+        id: data.user.id
+      }
+    })
+    if (user?.role === "ADMIN") {
+      isAdmin = true
+    }
+  }
 
   return (
     <div className="sticky top-0 z-50 w-full py-2 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -27,7 +38,7 @@ export default async function Header() {
         </Link>
         <NavLinks navItems={navItems} />
         <div className="flex items-center gap-2">
-          {data?.user ? <><p className="text-sm">{data?.user?.email}</p><form action={signOut}><Button size="sm" type="submit">Log Out</Button></form></> : <Button size="sm" asChild><Link href="/login">Sign In</Link></Button>}
+          {data?.user ? <UserMenu user={data.user} isAdmin={isAdmin} /> : <Button size="sm" asChild><Link href="/login">Sign In</Link></Button>}
           <ThemeToggle />
           <MobileMenu navItems={navItems} />
         </div>
