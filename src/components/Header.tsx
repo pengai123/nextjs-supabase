@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/server'
 import Image from 'next/image'
 import MobileMenu from "./MobileMenu"
 import UserMenu from "./UserMenu"
+import { prisma } from "@/lib/prisma"
 
 const navItems = [
   { name: "Home", href: "/" },
