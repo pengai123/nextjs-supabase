@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 const faqs = [
   {
     question: "What is the monthly charge, and what does it include?",
-    answer: "The monthly package is $40. This fee covers essential services, including reliable website hosting to keep your site running smoothly, regular server maintenance to ensure optimal performance, and domain registration or renewal to maintain your online presence. Additionally, the package includes an SSL certificate, which encrypts your site’s data for security and helps boost your credibility with visitors. We are also available for troubleshooting and minor updates, making this a comprehensive solution for maintaining your website."
+    answer: "The monthly package is $45. This fee covers essential services, including reliable website hosting to keep your site running smoothly, regular server maintenance to ensure optimal performance, and domain registration or renewal to maintain your online presence. Additionally, the package includes an SSL certificate, which encrypts your site’s data for security and helps boost your credibility with visitors. We are also available for troubleshooting and minor updates, making this a comprehensive solution for maintaining your website."
   },
   {
     question: "What is included in your website design and development services?",

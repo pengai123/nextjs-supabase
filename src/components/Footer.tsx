@@ -75,8 +75,8 @@ export default function Footer() {
                 <p>AZ 123123</p>
               </div> */}
               <div className="flex flex-col text-sm max-w-lg leading-relaxed tracking-tight text-background/65 text-left">
-                <Link href="/" className="hover:text-custom-blue">Terms of service</Link>
-                <Link href="/" className="hover:text-custom-blue">Privacy Policy</Link>
+                <Link href="/terms" className="hover:text-custom-blue">Terms of service</Link>
+                <Link href="/privacy-policy" className="hover:text-custom-blue">Privacy Policy</Link>
               </div>
             </div>
           </div>
