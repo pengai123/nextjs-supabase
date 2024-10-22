@@ -1,5 +1,5 @@
 "use client"
-import { resetPasswordForEmail } from '@/app/(auth)/actions'
+import { resetPasswordForEmail } from '@/app/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { forgotPasswordFormSchema, TforgotPasswordFormData } from "@/lib/zodSchemas"

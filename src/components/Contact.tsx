@@ -1,6 +1,5 @@
 "use client"
 
-
 import { Check, Mail, Phone } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -25,9 +24,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { submitContactMessage } from '@/app/actions'
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/hooks/use-toast"
 
 export default function Contact() {
   const [errorMsg, setErrorMsg] = useState('')
+  const { toast } = useToast()
   const form = useForm<TcontactFormData>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -40,18 +43,26 @@ export default function Contact() {
   const { isSubmitting } = form.formState
   const onSubmit = async (values: TcontactFormData) => {
     setErrorMsg("")
-    await new Promise((resolve) => setTimeout(resolve, 5000))
-    console.log("submitted:", values)
-    form.reset()
-    // try {
-    //   const res = await login(values)
-    //   if (res?.error) {
-    //     setErrorMsg(res.error)
-    //   }
-    // } catch (error: any) {
-    //   console.error(error)
-    //   setErrorMsg(error.message)
-    // }
+    // await new Promise((resolve) => setTimeout(resolve, 5000))
+    // console.log("submitted:", values)
+
+    try {
+      const res = await submitContactMessage(values)
+      if (res.error) {
+        return setErrorMsg(res.error)
+      }
+      toast({
+        title: "Notification",
+        description: res.success,
+        action: (
+          <ToastAction altText="Close">Close</ToastAction>
+        ),
+      })
+      form.reset()
+    } catch (error: any) {
+      console.error(error)
+      setErrorMsg(error.message)
+    }
   }
   return (
     <div className="w-full py-16 lg:py-32">

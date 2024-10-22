@@ -1,5 +1,5 @@
 "use client"
-import { login } from '@/app/(auth)/actions'
+import { login } from '@/app/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { loginFormSchema, TloginFormData } from "@/lib/zodSchemas"

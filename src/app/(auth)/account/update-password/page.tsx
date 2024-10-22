@@ -1,5 +1,5 @@
 "use client"
-import { validateAuth, updatePassword } from '@/app/(auth)/actions'
+import { validateAuth, updatePassword } from '@/app/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { updatePasswordFormSchema, TupdatePasswordFormData } from "@/lib/zodSchemas"

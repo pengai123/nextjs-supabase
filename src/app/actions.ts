@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { TloginFormData, TsignupFormData } from "@/lib/zodSchemas"
 import { prisma } from '@/lib/prisma'
+const nodemailer = require('nodemailer')
 
 export async function login(data: TloginFormData) {
   const supabase = createClient()
@@ -114,4 +115,41 @@ export async function validateAuth() {
   }
   console.log("user:", data?.user)
   return true
+}
+
+
+export async function submitContactMessage(msgBody: { name: string, company?: string, email: string, message: string }) {
+  const { name, company, email, message } = msgBody
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.zoho.com', // Change this based on the SMTP service you're using (e.g., smtp.gmail.com for Gmail)
+    port: 587, // or 587 if using TLS
+    secure: false, // true for port 465 (SSL), false for port 587 (TLS)
+    auth: {
+      user: process.env.HLS_CONTACT_EMAIL, // Your email address (e.g., Zoho Mail or Gmail)
+      pass: process.env.HLS_CONTACT_EMAIL_PASS, // Your email password or app-specific password
+    },
+  })
+
+  try {
+    const mailOptions = {
+      from: `"Hotlink Studio" <${process.env.HLS_CONTACT_EMAIL}>`,
+      to: process.env.HLS_CONTACT_EMAIL,
+      replyTo: email,
+      subject: 'New Contact Message from Hotlink Studio', // Subject line
+      html: `
+        <h1>New Message from Hotlink Studio Contact Page</h1>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Company:</strong> ${company}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong> ${message}</p>
+      `,
+    }
+
+    // 4. Send email
+    await transporter.sendMail(mailOptions)
+    return { success: 'Message sent successfully!' }
+  } catch (error: any) {
+    console.log(error.message)
+    return { error: 'Something went wrong while sending the message.' }
+  }
 }

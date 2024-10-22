@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LogOut, Settings, Shield, User } from "lucide-react"
-import { signOut } from "@/app/(auth)/actions"
+import { signOut } from "@/app/actions"
 
 export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolean }) {
 
