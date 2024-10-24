@@ -65,7 +65,7 @@ export default function FAQ() {
             <Badge variant="outline" className="text-primary">FAQ</Badge>
             <div className="flex gap-2 flex-col">
               <h4 className="text-3xl md:text-5xl tracking-tighter max-w-xl text-center font-regular">
-                Your Guide to Our Web Services
+                Frequently Asked Questions
               </h4>
               <p className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-xl text-center">
                 Clear Answers to Help You Navigate Our Services for a Seamless Online Experience
