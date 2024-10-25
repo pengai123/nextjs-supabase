@@ -5,6 +5,11 @@ import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const metadata = {
+  title: "Hotlink Studio",
+  description: "Connect you to the web, one hotlink at a time.",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

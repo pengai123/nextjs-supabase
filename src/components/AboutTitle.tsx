@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
 
-export default function ServiceTitle() {
+export default function AboutTitle() {
   const [titleNumber, setTitleNumber] = useState(0)
   const titles = useMemo(
     () => ["Website Design", "Website Hosting", "Domain Setup", "Business Email", "SSL Certificate", "Authentication"],

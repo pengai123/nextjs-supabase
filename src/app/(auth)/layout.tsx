@@ -1,13 +1,4 @@
-// import { Inter } from "next/font/google";
-// import "@/app/globals.css";
-// import { ThemeProvider } from "@/components/theme-provider"
-
-// const inter = Inter({ subsets: ["latin"] });
-
-export const metadata = {
-  title: "Auth",
-  description: "Authentication page",
-};
+import Header from "@/components/Header"
 
 export default function RootLayout({
   children,
@@ -15,8 +6,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="h-screen flex justify-center items-center">
-      {children}
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <div className="flex-1 flex justify-center items-center">
+        {children}
+      </div>
     </div>
   );
 }

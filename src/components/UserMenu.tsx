@@ -28,14 +28,18 @@ export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolea
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        {/* <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/icon.ico" alt="@user" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
+        </Button> */}
+        <Button variant="ghost" size="icon" className="relative h-8 w-8 rounded-full">
+          <User className="h-5 w-5" />
+          <span className="sr-only">User menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="center" forceMount>
+      <DropdownMenuContent className="w-56" align="start" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.email.split("@")[0]}</p>
@@ -53,7 +57,7 @@ export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolea
             </DropdownMenuItem>
           )}
           <DropdownMenuItem asChild>
-            <Link href="/private">
+            <Link href="/account/profile">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </Link>

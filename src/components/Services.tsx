@@ -2,10 +2,7 @@
 import Image from 'next/image'
 import Link from "next/link"
 import { usePathname } from 'next/navigation'
-import ServiceTitle from './ServiceTitle'
 import { Badge } from "@/components/ui/badge"
-import { MoveRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import About from '@/components/About'
 
 const services = [
@@ -37,15 +34,7 @@ export default function Services() {
     <section className="w-full">
       <div className="container mx-auto">
         <div className="flex gap-10 py-16 lg:py-32 items-center justify-center flex-col">
-          {pathname === "/" &&
-            <Button variant="secondary" size="sm" className="gap-4" asChild>
-              <Link href="/services">
-                Learn more <MoveRight className="w-4 h-4" />
-              </Link>
-            </Button>
-          }
-          <ServiceTitle />
-          {pathname !== "/" && <About />}
+          <About />
           <div className='flex flex-col gap-4 items-center mt-10'>
             <Badge variant="outline" className="text-primary">Services</Badge>
             <div className="flex gap-2 flex-col">
