@@ -55,7 +55,8 @@ export async function signup(data: TsignupFormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  // redirect('/')
+  redirect('/success?from=signup')
 }
 
 export async function signOut() {
@@ -71,7 +72,7 @@ export async function signOut() {
   redirect('/')
 }
 
-export async function resetPasswordForEmail(email: string) {
+export async function forgotPasswordForEmail(email: string) {
   const supabase = createClient()
   const user = await prisma.profile.findUnique({
     where: { email }
@@ -90,7 +91,7 @@ export async function resetPasswordForEmail(email: string) {
     return { error: error.message }
   }
   revalidatePath('/', 'layout')
-  redirect('/success')
+  redirect('/success?from=forgotpassword')
 }
 
 export async function updatePassword(newPwd: { password: string }) {
@@ -103,7 +104,7 @@ export async function updatePassword(newPwd: { password: string }) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/success')
+  redirect('/success?from=updatepassword')
 }
 
 export async function validateAuth() {

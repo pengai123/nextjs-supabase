@@ -1,5 +1,5 @@
 "use client"
-import { resetPasswordForEmail } from '@/app/actions'
+import { forgotPasswordForEmail } from '@/app/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { forgotPasswordFormSchema, TforgotPasswordFormData } from "@/lib/zodSchemas"
@@ -24,7 +24,7 @@ import {
 import Link from "next/link"
 import { useState } from 'react'
 
-export default function ResetPasswordPage() {
+export default function ForgotPasswordPage() {
   const [message, setMessage] = useState("")
   const form = useForm<TforgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordFormSchema),
@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
     console.log('email:', email)
 
     try {
-      const res = await resetPasswordForEmail(email)
+      const res = await forgotPasswordForEmail(email)
       if (res?.error) {
         setMessage(res.error)
       }
