@@ -44,36 +44,38 @@ export default function Page({ searchParams }: { searchParams: { [key: string]: 
   }
 
   return (
-    <div className="text-center max-w-lg w-full p-8 rounded-lg">
-      <CircleCheck className="w-16 h-16 text-green-500 mx-auto mb-4" />
-      <h1 className="text-2xl font-bold mb-2">{message.title}</h1>
-      <p className="text-muted-foreground mb-4">
-        {message.subtitle}
-      </p>
-      <div className="bg-green-50 text-green-600 border border-green-200 rounded-md p-4 mb-6">
-        <div className="flex items-center">
-          {message.alertIcon === "email" && <Mail className="w-5 h-5 flex-shrink-0 mr-4" />}
-          {message.alertIcon === "lock" && <LockKeyhole className="w-5 h-5 flex-shrink-0 mr-4" />}
-          <p className=" text-sm text-start">
-            {message.alert}
-          </p>
+    <main className='flex justify-center items-center'>
+      <div className="text-center max-w-lg w-full p-8 rounded-lg">
+        <CircleCheck className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <h1 className="text-2xl font-bold mb-2">{message.title}</h1>
+        <p className="text-muted-foreground mb-4">
+          {message.subtitle}
+        </p>
+        <div className="bg-green-50 text-green-600 border border-green-200 rounded-md p-4 mb-6">
+          <div className="flex items-center">
+            {message.alertIcon === "email" && <Mail className="w-5 h-5 flex-shrink-0 mr-4" />}
+            {message.alertIcon === "lock" && <LockKeyhole className="w-5 h-5 flex-shrink-0 mr-4" />}
+            <p className=" text-sm text-start">
+              {message.alert}
+            </p>
+          </div>
         </div>
-      </div>
-      <Button asChild className="w-full mb-2">
-        <Link href="/">
-          Go Home
-        </Link>
-      </Button>
-      <Button asChild className="w-full" variant="outline">
-        {from === "updatepassword" ?
-          <Link href="/account/profile">
-            Go To Profile
-          </Link> :
-          <Link href="/login">
-            Return To Login
+        <Button asChild className="w-full mb-2">
+          <Link href="/">
+            Go Home
           </Link>
-        }
-      </Button>
-    </div >
+        </Button>
+        <Button asChild className="w-full" variant="outline">
+          {from === "updatepassword" ?
+            <Link href="/account/profile">
+              Go To Profile
+            </Link> :
+            <Link href="/login">
+              Return To Login
+            </Link>
+          }
+        </Button>
+      </div >
+    </main>
   )
 }

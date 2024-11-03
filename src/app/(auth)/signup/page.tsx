@@ -5,6 +5,16 @@ import { useForm } from "react-hook-form"
 import { signupFormSchema, TsignupFormData } from "@/lib/zodSchemas"
 import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
+import { COUNTRY_CODES } from "@/lib/utils"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+
 import {
   Card,
   CardContent,
@@ -31,10 +41,14 @@ export default function SignupPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      fullName: "",
+      phoneCountryCode: "1",
+      phoneNumber: "",
     },
   })
   const { isSubmitting } = form.formState
   const onSubmit = async (values: TsignupFormData) => {
+    console.log('values:', values)
     setErrorMsg("")
     try {
       const res = await signup(values)
@@ -47,11 +61,11 @@ export default function SignupPage() {
   }
 
   return (
-    <main>
-      <Card className="w-[350px] min-h-96">
+    <main className='flex justify-center items-center'>
+      <Card className="w-full max-w-md min-h-96 border-0 shadow-none md:border md:shadow">
         <CardHeader>
           <CardTitle className="text-xl">Sign Up</CardTitle>
-          <CardDescription>Sign up to stay connected and make the most of your experience.</CardDescription>
+          <CardDescription>Enter your details below to create your account.</CardDescription>
         </CardHeader>
         <CardContent >
           <Form {...form}>
@@ -104,6 +118,68 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="space-y-2">
+                <FormLabel>Phone Number (Optional)</FormLabel>
+                <div className="flex gap-2">
+                  <FormField
+                    control={form.control}
+                    name="phoneCountryCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Select
+                            defaultValue={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger className="w-[120px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {COUNTRY_CODES.map((code) => (
+                                <SelectItem key={code.value} value={code.value}>
+                                  {code.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        {/* <FormLabel>Phone Number (Optional)</FormLabel> */}
+                        <FormControl>
+                          <Input
+                            className="flex-1"
+                            type="tel"
+                            placeholder="123456789"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
               <Button type="submit" disabled={isSubmitting}>SIGN UP</Button>
               {errorMsg && <p className="text-sm text-red-600 font-medium text-center p-2 bg-red-200/20">{errorMsg}</p>}
               <p className='mt-4 text-xs text-right'>Already have an account? <Link className='text-custom-blue underline' href="/login">Log in</Link> now.</p>

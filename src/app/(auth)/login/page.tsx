@@ -47,8 +47,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main>
-      <Card className="w-[350px] min-h-96">
+    <main className='flex justify-center items-center'>
+      <Card className="w-full max-w-md min-h-96 border-0 shadow-none md:border md:shadow">
         <CardHeader>
           <CardTitle className="text-xl">Log In</CardTitle>
           <CardDescription>Log in to your account to stay connected and make the most of your experience.</CardDescription>

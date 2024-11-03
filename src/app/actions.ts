@@ -7,16 +7,10 @@ import { TloginFormData, TsignupFormData } from "@/lib/zodSchemas"
 import { prisma } from '@/lib/prisma'
 const nodemailer = require('nodemailer')
 
-export async function login(data: TloginFormData) {
+export async function login(formData: TloginFormData) {
   const supabase = createClient()
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  // const data = {
-  //   email: formData.get('email') as string,
-  //   password: formData.get('password') as string,
-  // }
-  console.log('data:', data)
-  const { error } = await supabase.auth.signInWithPassword(data)
+  console.log('formData:', formData)
+  const { error } = await supabase.auth.signInWithPassword(formData)
 
   if (error) {
     console.log('error:', error.message)
@@ -27,35 +21,53 @@ export async function login(data: TloginFormData) {
   redirect('/')
 }
 
-export async function signup(data: TsignupFormData) {
+export async function signup(formData: TsignupFormData) {
+  const { email, password, fullName, phoneCountryCode, phoneNumber } = formData
   const supabase = createClient()
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  // const data = {
-  //   email: formData.get('email') as string,
-  //   password: formData.get('password') as string,
-  // }
-  console.log('data:', data)
+  console.log('formData:', formData)
+  try {
+    // Check if a profile with this email already exists
+    const existingUser = await prisma.profile.findUnique({
+      where: { email }
+    })
 
-  const user = await prisma.profile.findUnique({
-    where: { email: data.email }
-  })
+    console.log('existingUser:', existingUser)
 
-  console.log('user:', user)
+    if (existingUser) {
+      return { error: "This account already exists." }
+    }
 
-  if (user) {
-    return { error: "This account already exists." }
+    // Create new user in Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+
+    if (error) {
+      console.log('Supabase auth error:', error)
+      return { error: error.message }
+    }
+
+    // Get the new user's ID from Supabase
+    const userId = data?.user?.id;
+
+    if (userId) {
+      // Update the profile with additional information (full_name, phone, etc.)
+      await prisma.profile.update({
+        where: { id: userId },  // Match the profile by Supabase user ID
+        data: {
+          full_name: fullName || null,
+          phone_country_code: phoneCountryCode || null,
+          phone_number: phoneNumber || null,
+        },
+      });
+    }
+  } catch (error: any) {
+    console.log('error:', error.message)
+    return { error: "An unexpected error occurred. Please try again." }
   }
-
-  const { error } = await supabase.auth.signUp(data)
-
-  if (error) {
-    console.log('error:', error)
-    return { error: error.message }
-  }
-
+  //Redirect to success page
   revalidatePath('/', 'layout')
-  // redirect('/')
   redirect('/success?from=signup')
 }
 
@@ -116,6 +128,31 @@ export async function validateAuth() {
   }
   console.log("user:", data?.user)
   return true
+}
+
+export async function getUserData() {
+  const supabase = createClient()
+  const { data, error } = await supabase.auth.getUser()
+
+  if (error || !data?.user) {
+    redirect('/login')
+    return { error: "User is not logged in. Please login in your account first." }
+  }
+
+  // Get the user's ID from Supabase
+  const userId = data?.user?.id;
+  try {
+    // Fetch the profile from Prisma using the user's ID
+    const profile = await prisma.profile.findUnique({
+      where: { id: userId },  // Match the profile by Supabase user ID
+    })
+    if (!profile) {
+      return { error: "Profile not found for the user." };
+    }
+    return { authData: data.user, profile }
+  } catch (error) {
+    return { error: "An unexpected error occurred. Please try again." }
+  }
 }
 
 
