@@ -39,7 +39,7 @@ export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolea
           <span className="sr-only">User menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="start" forceMount>
+      <DropdownMenuContent className="w-56" align="center" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.email.split("@")[0]}</p>
@@ -57,17 +57,23 @@ export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolea
             </DropdownMenuItem>
           )}
           <DropdownMenuItem asChild>
-            <Link href="/account/profile">
+            <Link href="/profile">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
+            <Link href="/account">
+              <Shield className="mr-2 h-4 w-4" />
+              <span>Account</span>
+            </Link>
+          </DropdownMenuItem>
+          {/* <DropdownMenuItem asChild>
             <Link href="/settings">
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </Link>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>

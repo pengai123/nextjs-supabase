@@ -1,10 +1,11 @@
 "use client"
-import { validateAuth, updatePassword } from '@/app/actions'
+import { getAuthData, updatePassword } from '@/app/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { updatePasswordFormSchema, TupdatePasswordFormData } from "@/lib/zodSchemas"
+import { forgotPasswordUpdateForm, TForgotPasswordUpdateData } from "@/lib/zodSchemas"
 import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
   Card,
@@ -25,17 +26,19 @@ import Link from "next/link"
 
 export default function UpdatePasswordPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [message, setMessage] = useState("")
+  const router = useRouter()
 
-  const form = useForm<TupdatePasswordFormData>({
-    resolver: zodResolver(updatePasswordFormSchema),
+  const form = useForm<TForgotPasswordUpdateData>({
+    resolver: zodResolver(forgotPasswordUpdateForm),
     defaultValues: {
       newPassword: "",
       confirmNewPassword: "",
     },
   })
   const { isSubmitting } = form.formState
-  const onSubmit = async (values: TupdatePasswordFormData) => {
+  const onSubmit = async (values: TForgotPasswordUpdateData) => {
     console.log('values:', values)
     setMessage("")
     try {
@@ -50,15 +53,19 @@ export default function UpdatePasswordPage() {
   }
 
   const checkAuth = async () => {
-    const res = await validateAuth()
-    if (res) { setIsLoggedIn(true) }
+    const { authData, error } = await getAuthData()
+    if (error || !authData) {
+      return router.push('/login')
+    }
+    setIsLoggedIn(true)
+    setIsLoading(true)
   }
 
   useEffect(() => {
     checkAuth()
   }, [])
 
-  if (!isLoggedIn) {
+  if (isLoading) {
     return <p>Loading...</p>
   }
 

@@ -1,7 +1,6 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,84 +22,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import { updateProfile } from "./actions";
+import { updateProfile } from "@/app/actions";
 import { formatPhoneNumber } from "@/lib/utils";
 import { COUNTRY_CODES } from "@/lib/utils";
-
-const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  phoneCountryCode: z.string().optional(),
-  phoneNumber: z
-    .string()
-    .regex(/^\d{1,15}$/, "Please enter a valid phone number")
-    .optional()
-    .or(z.literal("")),
-  company: z.string().optional(),
-  website: z
-    .string()
-    .url("Please enter a valid URL")
-    .optional()
-    .or(z.literal("")),
-})
+import { profileFormData, TprofileFormData } from "@/lib/zodSchemas";
 
 export default function UserProfile({ user: { authData, profile } }: { user: { authData: any, profile: any } }) {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<TprofileFormData>({
+    resolver: zodResolver(profileFormData),
     defaultValues: {
-      email: profile.email,
-      fullName: profile.full_name,
-      phoneCountryCode: profile.phone_country_code,
-      phoneNumber: profile.phone_number,
-      company: "Example Corp",
-      website: "https://example.com",
+      fullName: profile.full_name || "",
+      phoneCountryCode: profile.phone_country_code || "",
+      phoneNumber: profile.phone_number || "",
+      company: profile.company || "",
+      website: profile.website || "",
     },
   });
+  const { isSubmitting } = form.formState
 
   const joinedDate = authData.created_at
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
   const formattedJoinedDate = new Date(joinedDate).toLocaleDateString('en-US', options)
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: TprofileFormData) {
     console.log('values:', values)
-    // try {
-    //   setIsLoading(true);
-    //   const fullPhoneNumber = values.phoneNumber
-    //     ? `+${values.phoneCountryCode}${values.phoneNumber}`
-    //     : undefined;
+    try {
+      const result = await updateProfile(values);
+      console.log('result:', result)
 
-    //   const result = await updateProfile({
-    //     ...values,
-    //     phoneNumber: fullPhoneNumber,
-    //   });
+      if (result.error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: result.error,
+        });
+        return;
+      }
 
-    //   if (result.error) {
-    //     toast({
-    //       variant: "destructive",
-    //       title: "Error",
-    //       description: result.error,
-    //     });
-    //     return;
-    //   }
-
-    //   toast({
-    //     title: "Success",
-    //     description: "Your profile has been updated.",
-    //   });
-    //   setIsEditing(false);
-    // } catch (error) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Error",
-    //     description: "Something went wrong. Please try again.",
-    //   });
-    // } finally {
-    //   setIsLoading(false);
-    // }
+      toast({
+        title: "Success!",
+        description: result.message,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+      });
+    }
   }
 
   const DisplayField = ({
@@ -110,13 +83,13 @@ export default function UserProfile({ user: { authData, profile } }: { user: { a
   }: {
     icon: React.ElementType;
     label: string;
-    value: string;
+    value: string | undefined;
   }) => (
     <div className="space-y-2">
       <span className="text-sm font-medium text-muted-foreground">{label}</span>
       <div className="flex items-center space-x-3">
-        <Icon className="h-4 w-4 text-muted-foreground" />
-        <span className="text-base">{value || "—"}</span>
+        <Icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <span className={`text-base ${value ? "text-foreground" : "text-muted-foreground"}`}>{value || "Not set"}</span>
       </div>
     </div>
   );
@@ -127,33 +100,37 @@ export default function UserProfile({ user: { authData, profile } }: { user: { a
     : undefined;
 
   return (
-    <div className="flex justify-center p-4 space-y-8">
-      < Card className="p-8 w-full max-w-2xl border-0 shadow-none" >
-        <div className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="rounded-full bg-primary/10 p-4">
-                <User className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
-                <p className="text-muted-foreground">
-                  Manage your account information
-                </p>
-              </div>
-            </div>
-            {!isEditing && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setIsEditing(true)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            )}
+    <div className="px-2 py-20 sm:px-4 md:px-8 lg:px-16 space-y-8">
+      {/* Profile header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
+            <p className="text-muted-foreground">
+              Manage your profile information
+            </p>
           </div>
+        </div>
+        {!isEditing && (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsEditing(true)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
 
-          <div className="border-b pb-6">
+
+      < Card className="p-2 md:p-8 w-full" >
+        <div className="space-y-8">
+          <div className="grid gap-6 md:grid-cols-2 border-b pb-6">
+            <DisplayField
+              icon={Mail}
+              label="Email Address"
+              value={authData.email}
+            />
             <DisplayField
               icon={Calendar}
               label="Member Since"
@@ -181,29 +158,6 @@ export default function UserProfile({ user: { authData, profile } }: { user: { a
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              className="pl-9"
-                              placeholder="you@example.com"
-                              type="email"
-                              {...field}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <div className="space-y-2 md:col-span-2">
                     <FormLabel>Phone Number</FormLabel>
                     <div className="flex gap-2">
@@ -312,8 +266,8 @@ export default function UserProfile({ user: { authData, profile } }: { user: { a
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save Changes"}
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Saving..." : "Save Changes"}
                   </Button>
                 </div>
               </form>
@@ -326,24 +280,19 @@ export default function UserProfile({ user: { authData, profile } }: { user: { a
                 value={values.fullName}
               />
               <DisplayField
-                icon={Mail}
-                label="Email"
-                value={values.email}
-              />
-              <DisplayField
                 icon={Phone}
                 label="Phone Number"
-                value={formattedPhone || ""}
+                value={formattedPhone}
               />
               <DisplayField
                 icon={Building2}
                 label="Company"
-                value={values.company || ""}
+                value={values.company}
               />
               <DisplayField
                 icon={Globe}
                 label="Website"
-                value={values.website || ""}
+                value={values.website}
               />
             </div>
           )}

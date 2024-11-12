@@ -16,6 +16,8 @@ model Profile {
   phone_country_code String?
   phone_number       String?
   full_name          String?
+  company            String?
+  website            String?
 
   @@map("profiles")
   @@schema("public")

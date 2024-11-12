@@ -3,18 +3,18 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-import { TloginFormData, TsignupFormData } from "@/lib/zodSchemas"
+import { TloginFormData, TprofileFormData, TsignupFormData, TupdateEmailFormData, TupdatePasswordFormData } from "@/lib/zodSchemas"
 import { prisma } from '@/lib/prisma'
+import { headers } from 'next/headers'
 const nodemailer = require('nodemailer')
 
 export async function login(formData: TloginFormData) {
   const supabase = createClient()
   console.log('formData:', formData)
-  const { error } = await supabase.auth.signInWithPassword(formData)
+  const { data, error } = await supabase.auth.signInWithPassword(formData)
 
-  if (error) {
-    console.log('error:', error.message)
-    return { error: error.message }
+  if (error || !data.user) {
+    return { error: "Invalid email or password." }
   }
 
   revalidatePath('/', 'layout')
@@ -71,6 +71,114 @@ export async function signup(formData: TsignupFormData) {
   redirect('/success?from=signup')
 }
 
+export async function updateEmail(formData: TupdateEmailFormData) {
+  //Get origin
+  const headersList = headers()
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'http' // Use https in production if set by your reverse proxy
+  const origin = `${protocol}://${host}`
+
+  console.log('origin:', origin)
+
+  const { currentEmail, newEmail, password } = formData
+  console.log('update email formData:', formData)
+  const supabase = createClient()
+
+  //Authenticate the user with their current email and password
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    email: currentEmail,
+    password,
+  })
+
+  if (signInError || !signInData.user) {
+    return { error: "Invalid email or password." };
+  }
+
+  // Update the user's email with Supabase auth
+  const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+    email: newEmail,
+  }, {
+    emailRedirectTo: `${origin}/account`
+  });
+
+  if (updateError) {
+    return { error: "Failed to update email. Please try again." };
+  }
+
+  return { success: true, message: "We've sent a confirmation email to your new email address. Please check your inbox and follow the link to confirm the change and complete the update." }
+}
+
+export async function updateAccountPassword({ email, formData }: { email: string, formData: TupdatePasswordFormData }) {
+  //Get origin
+  const headersList = headers()
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'http' // Use https in production if set by your reverse proxy
+  const origin = `${protocol}://${host}`
+
+  console.log('origin:', origin)
+
+  const { currentPassword, newPassword } = formData
+  console.log('update password formData:', formData)
+  const supabase = createClient()
+
+  //Authenticate the user with their current email and password
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password: currentPassword,
+  })
+
+  if (signInError || !signInData.user) {
+    return { error: "Invalid email or password." };
+  }
+
+  // Update the user's password with Supabase auth
+  const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (updateError) {
+    return { error: "Failed to update password. Please try again." };
+  }
+
+  return { success: true, message: "Your password has been successfully updated. You can now log in with your new password." }
+}
+
+export async function updateProfile(formData: TprofileFormData) {
+  const { fullName, phoneCountryCode, phoneNumber, company, website } = formData
+
+  try {
+    // Get the current user's ID from Supabase Auth
+    const { authData, profile, error } = await getUserData()
+    if (error) {
+      return { error: "Failed to fetch user information." }
+    }
+
+    // Check for changes, update profile table
+    const updates: Record<string, any> = {}
+    if (fullName !== profile?.full_name) updates.full_name = fullName;
+    if (phoneCountryCode !== profile?.phone_country_code) updates.phone_country_code = phoneCountryCode;
+    if (phoneNumber !== profile?.phone_number) updates.phone_number = phoneNumber;
+    if (company !== profile?.company) updates.company = company;
+    if (website !== profile?.website) updates.website = website;
+
+    // If there are changes, update the profile
+    if (Object.keys(updates).length > 0) {
+      // Update the profile with additional information (full_name, phone, etc.)
+      await prisma.profile.update({
+        where: { id: authData?.id },  // Match the profile by Supabase user ID
+        data: updates,
+      });
+
+      revalidatePath('/profile')
+      return { success: true, message: "Profile updated successfully" };
+    } else {
+      return { success: true, message: "No changes detected" };
+    }
+  } catch (error: any) {
+    return { error: "An unexpected error occurred. Please try again." };
+  }
+}
+
 export async function signOut() {
   const supabase = createClient()
   const { error } = await supabase.auth.signOut()
@@ -78,6 +186,7 @@ export async function signOut() {
   if (error) {
     console.log('error:', error?.message)
     redirect('/error')
+    return
   }
 
   revalidatePath('/', 'layout')
@@ -119,24 +228,49 @@ export async function updatePassword(newPwd: { password: string }) {
   redirect('/success?from=updatepassword')
 }
 
-export async function validateAuth() {
+export async function deleteAccount(confirmation: string) {
+  const supabase = createClient()
+
+  if (confirmation !== "DELETE") {
+    return { error: "Please type DELETE to confirm the deletion of your account." }
+  }
+
+  try {
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error || !data.user) {
+      return { error: "User is not logged in." }
+    }
+
+    // Delete the currently authenticated user from the auth.users table
+    const { error: deleteAuthError } = await supabase.rpc("delete_user")
+    if (deleteAuthError) {
+      return { error: `Failed to delete user from Auth: ${deleteAuthError.message}` }
+    }
+
+    revalidatePath('/', 'layout')
+    return { success: true, message: 'Account deleted successfully.' }
+  } catch (error: any) {
+    return { success: false, message: `Error deleting account: ${error.message}` }
+  }
+}
+
+export async function getAuthData() {
   const supabase = createClient()
   const { data, error } = await supabase.auth.getUser()
 
   if (error || !data?.user) {
-    redirect('/login')
+    return { error: "User is not logged in." }
   }
-  console.log("user:", data?.user)
-  return true
+  return { authData: data.user }
 }
 
 export async function getUserData() {
   const supabase = createClient()
   const { data, error } = await supabase.auth.getUser()
 
-  if (error || !data?.user) {
-    redirect('/login')
-    return { error: "User is not logged in. Please login in your account first." }
+  if (error || !data.user) {
+    return { error: "User is not logged in." }
   }
 
   // Get the user's ID from Supabase

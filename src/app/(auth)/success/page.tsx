@@ -67,7 +67,7 @@ export default function Page({ searchParams }: { searchParams: { [key: string]: 
         </Button>
         <Button asChild className="w-full" variant="outline">
           {from === "updatepassword" ?
-            <Link href="/account/profile">
+            <Link href="/profile">
               Go To Profile
             </Link> :
             <Link href="/login">
