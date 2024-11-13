@@ -33,7 +33,7 @@ export async function signup(formData: TsignupFormData) {
   const { email, password, fullName, phoneCountryCode, phoneNumber } = formData
   const supabase = createClient()
   const origin = getOrigin()
-  console.log('formData:', formData)
+  const redirectTo = `${origin}/profile`
   try {
     // Check if a profile with this email already exists
     const existingUser = await prisma.profile.findUnique({
@@ -51,27 +51,34 @@ export async function signup(formData: TsignupFormData) {
       email,
       password,
       options: {
-        emailRedirectTo: `${origin}/profile`, // Redirect to "/profile" after confirmation
+        emailRedirectTo: redirectTo, // Redirect to "/profile" after confirmation
       },
     })
 
-    if (error) {
-      console.log('Supabase auth error:', error)
-      return { error: error.message }
+    if (error || !data.user) {
+      console.log('signup error:', error)
+      return { error: error?.message }
     }
 
     // Get the new user's ID from Supabase
-    const userId = data?.user?.id;
+    const userId = data.user?.id;
 
-    if (userId) {
+    //Update any filled profile data
+    const profileData: Record<string, any> = {}
+    if (fullName) {
+      profileData.full_name = fullName
+    }
+
+    if (phoneNumber) {
+      profileData.phone_number = phoneNumber
+      profileData.phone_country_code = phoneCountryCode
+    }
+
+    if (fullName || phoneNumber) {
       // Update the profile with additional information (full_name, phone, etc.)
       await prisma.profile.update({
         where: { id: userId },  // Match the profile by Supabase user ID
-        data: {
-          full_name: fullName || null,
-          phone_country_code: phoneCountryCode || null,
-          phone_number: phoneNumber || null,
-        },
+        data: profileData,
       });
     }
   } catch (error: any) {
