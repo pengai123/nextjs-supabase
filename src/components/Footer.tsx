@@ -4,9 +4,30 @@ import Image from 'next/image'
 export default function Footer() {
   const navigationItems = [
     {
-      title: "Home",
-      href: "/",
+      title: "Quick Links",
       description: "",
+      items: [
+        {
+          title: "Home",
+          href: "/",
+        },
+        {
+          title: "Log in",
+          href: "/login",
+        },
+        {
+          title: "Sign up",
+          href: "/signup",
+        },
+        {
+          title: "Account",
+          href: "/account",
+        },
+        {
+          title: "Profile",
+          href: "/profile",
+        },
+      ]
     },
     {
       title: "Services",
@@ -14,19 +35,19 @@ export default function Footer() {
       items: [
         {
           title: "Website design",
-          href: "/services",
+          href: "",
         },
         {
           title: "Website hosting",
-          href: "/services",
+          href: "",
         },
         {
           title: "Domain setup",
-          href: "/services",
+          href: "",
         },
         {
           title: "Business Email setup",
-          href: "/services",
+          href: "",
         },
       ],
     },
@@ -35,12 +56,16 @@ export default function Footer() {
       description: "Managing a small business today is already tough.",
       items: [
         {
-          title: "FAQ",
-          href: "/faq",
+          title: "About us",
+          href: "/services",
         },
         {
-          title: "About us",
-          href: "/about",
+          title: "Services",
+          href: "/services",
+        },
+        {
+          title: "FAQ",
+          href: "/faq",
         },
         {
           title: "Contact us",
@@ -80,34 +105,30 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          <div className="grid lg:grid-cols-3 gap-10 items-start">
+          <div className="grid md:grid-cols-3 gap-10 items-start">
             {navigationItems.map((item) => (
               <div
                 key={item.title}
                 className="flex text-base gap-1 flex-col items-start"
               >
                 <div className="flex flex-col gap-2">
-                  {item.href ? (
-                    <Link
-                      href={item.href}
-                      className="flex justify-between items-center"
-                    >
-                      <span className="text-lg hover:text-custom-blue">{item.title}</span>
-                    </Link>
-                  ) : (
-                    <p className="text-lg">{item.title}</p>
-                  )}
+                  <p className="text-lg">{item.title}</p>
                   {item.items &&
                     item.items.map((subItem) => (
-                      <Link
-                        key={subItem.title}
-                        href={subItem.href}
-                        className="flex justify-between items-center"
-                      >
-                        <span className="text-background/65 text-sm hover:text-custom-blue">
-                          {subItem.title}
-                        </span>
-                      </Link>
+                      subItem.href ?
+                        (
+                          <Link
+                            key={subItem.title}
+                            href={subItem.href}
+                            className="flex justify-between items-center"
+                          >
+                            <span className="text-background/65 text-sm hover:text-custom-blue">
+                              {subItem.title}
+                            </span>
+                          </Link>
+                        ) : (
+                          <p className="text-background/65 text-sm">{subItem.title}</p>
+                        )
                     ))}
                 </div>
               </div>
