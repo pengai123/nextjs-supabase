@@ -58,7 +58,7 @@ export default function UpdatePasswordPage() {
       return router.push('/login')
     }
     setIsLoggedIn(true)
-    setIsLoading(true)
+    setIsLoading(false)
   }
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function UpdatePasswordPage() {
   }, [])
 
   if (isLoading) {
-    return <p>Loading...</p>
+    return <p className="min-h-[calc(100vh-74px)] flex justify-center items-center">Loading...</p>
   }
 
 

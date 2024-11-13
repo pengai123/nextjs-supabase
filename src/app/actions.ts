@@ -8,6 +8,14 @@ import { prisma } from '@/lib/prisma'
 import { headers } from 'next/headers'
 const nodemailer = require('nodemailer')
 
+function getOrigin() {
+  const headersList = headers()
+  const host = headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || 'http' // Use https in production if set by your reverse proxy
+  const origin = `${protocol}://${host}`
+  return origin
+}
+
 export async function login(formData: TloginFormData) {
   const supabase = createClient()
   console.log('formData:', formData)
@@ -73,11 +81,7 @@ export async function signup(formData: TsignupFormData) {
 
 export async function updateEmail(formData: TupdateEmailFormData) {
   //Get origin
-  const headersList = headers()
-  const host = headersList.get('host')
-  const protocol = headersList.get('x-forwarded-proto') || 'http' // Use https in production if set by your reverse proxy
-  const origin = `${protocol}://${host}`
-
+  const origin = getOrigin()
   console.log('origin:', origin)
 
   const { currentEmail, newEmail, password } = formData
@@ -104,7 +108,7 @@ export async function updateEmail(formData: TupdateEmailFormData) {
   if (updateError) {
     return { error: "Failed to update email. Please try again." };
   }
-
+  revalidatePath('/', 'layout')
   return { success: true, message: "We've sent a confirmation email to your new email address. Please check your inbox and follow the link to confirm the change and complete the update." }
 }
 
