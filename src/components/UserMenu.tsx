@@ -12,10 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, Settings, Shield, User } from "lucide-react"
+import { LogOut, Settings, Shield, User, Bell } from "lucide-react"
 import { signOut } from "@/app/actions"
 
-export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolean }) {
+export default function UserMenu({ authData, profile }: { authData: any, profile: any }) {
 
   const handleLogout = async () => {
     try {
@@ -24,6 +24,8 @@ export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolea
       console.error(error)
     }
   }
+
+  const displayName = profile.full_name ? profile.full_name : authData.email.split("@")[0]
 
   return (
     <DropdownMenu>
@@ -42,13 +44,13 @@ export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolea
       <DropdownMenuContent className="w-56" align="center" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.email.split("@")[0]}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            <p className="text-sm font-medium leading-none">{displayName}</p>
+            <p className="text-xs leading-none text-muted-foreground">{authData.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {isAdmin && (
+          {profile.role === "ADMIN" && (
             <DropdownMenuItem asChild>
               <Link href="/admin">
                 <Shield className="mr-2 h-4 w-4" />
@@ -66,6 +68,12 @@ export default function UserMenu({ user, isAdmin }: { user: any, isAdmin: boolea
             <Link href="/account">
               <Shield className="mr-2 h-4 w-4" />
               <span>Account</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/notification">
+              <Bell className="mr-2 h-4 w-4" />
+              <span>Notifications</span>
             </Link>
           </DropdownMenuItem>
           {/* <DropdownMenuItem asChild>

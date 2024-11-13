@@ -1,4 +1,5 @@
-import { User, Shield, Settings } from "lucide-react"
+"use client"
+import { User, Shield, Settings, Bell } from "lucide-react"
 import Link from 'next/link'
 import {
   Sidebar,
@@ -9,7 +10,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar
 } from "@/components/ui/sidebar"
+
 
 // Menu items.
 const items = [
@@ -23,9 +26,15 @@ const items = [
     href: "/account",
     icon: Shield,
   },
+  {
+    title: "Notifications",
+    href: "/notification",
+    icon: Bell,
+  },
 ]
 
 export function SettingsSidebar() {
+  const { setOpenMobile } = useSidebar()
   return (
     <Sidebar className="h-full inset-y-auto">
       <SidebarContent>
@@ -43,7 +52,9 @@ export function SettingsSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.href}>
+                    <Link href={item.href}
+                      onClick={() => setOpenMobile(false)}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>

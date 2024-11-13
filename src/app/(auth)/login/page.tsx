@@ -42,7 +42,7 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       console.error(error)
-      setErrorMsg(error.message)
+      setErrorMsg("An unexpected error occurred. Please try again.")
     }
   }
 

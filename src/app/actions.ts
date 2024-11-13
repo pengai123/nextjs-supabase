@@ -26,7 +26,7 @@ export async function login(formData: TloginFormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/profile')
 }
 
 export async function signup(formData: TsignupFormData) {
