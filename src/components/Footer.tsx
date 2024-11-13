@@ -127,7 +127,7 @@ export default function Footer() {
                             </span>
                           </Link>
                         ) : (
-                          <p className="text-background/65 text-sm">{subItem.title}</p>
+                          <p key={subItem.title} className="text-background/65 text-sm">{subItem.title}</p>
                         )
                     ))}
                 </div>
