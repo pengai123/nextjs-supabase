@@ -32,6 +32,7 @@ export async function login(formData: TloginFormData) {
 export async function signup(formData: TsignupFormData) {
   const { email, password, fullName, phoneCountryCode, phoneNumber } = formData
   const supabase = createClient()
+  const origin = getOrigin()
   console.log('formData:', formData)
   try {
     // Check if a profile with this email already exists
@@ -49,6 +50,9 @@ export async function signup(formData: TsignupFormData) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${origin}/profile`, // Redirect to "/profile" after confirmation
+      },
     })
 
     if (error) {
