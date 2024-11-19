@@ -1,5 +1,6 @@
 "use client"
 import { User, Shield, Settings, Bell } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
 import Link from 'next/link'
 import {
   Sidebar,
@@ -38,22 +39,26 @@ export function SettingsSidebar() {
   return (
     <Sidebar className="h-full inset-y-auto">
       <SidebarContent>
-        <SidebarGroup className="px-2 py-6">
+        <SidebarGroup className="px-5 py-10">
           {/* <SidebarGroupLabel>
             <Settings className="h-5 w-5" />
             <h2 className="text-lg font-semibold tracking-tight">Settings</h2>
           </SidebarGroupLabel> */}
           <div className="flex items-center gap-2 px-2 py-2">
             <Settings className="h-5 w-5" />
-            <h2 className="text-lg font-semibold tracking-tight">Settings</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">Settings</h2>
           </div>
-          <SidebarGroupContent>
+
+          <Separator className="my-2" />
+
+          <SidebarGroupContent className="py-4">
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link href={item.href}
                       onClick={() => setOpenMobile(false)}
+                      className="!text-base"
                     >
                       <item.icon />
                       <span>{item.title}</span>

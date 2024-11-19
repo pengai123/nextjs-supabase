@@ -87,7 +87,7 @@ export default function UpdatePasswordPage() {
                   <FormItem>
                     <FormLabel>New Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="New Password" type="password" {...field} />
+                      <Input placeholder="••••••••" type="password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -100,7 +100,7 @@ export default function UpdatePasswordPage() {
                   <FormItem>
                     <FormLabel>Confirm New Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="Confirm New Password" type="password" {...field} />
+                      <Input placeholder="••••••••" type="password" {...field} />
                     </FormControl>
                     {/* <FormDescription>
                       This is your password.

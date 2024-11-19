@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Email" {...field} />
+                      <Input placeholder="you@example.com" {...field} />
                     </FormControl>
                     <FormDescription>
                       This is the email address for the account for which you want to reset the password.

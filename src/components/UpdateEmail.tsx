@@ -106,7 +106,7 @@ export function UpdateEmail({ authData }: { authData: any }) {
                       <FormItem>
                         <FormLabel>New Email</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter new email address" />
+                          <Input {...field} placeholder="you@example.com" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -119,7 +119,7 @@ export function UpdateEmail({ authData }: { authData: any }) {
                       <FormItem>
                         <FormLabel>Current Password</FormLabel>
                         <FormControl>
-                          <Input {...field} type="password" placeholder="Enter your password" />
+                          <Input {...field} type="password" placeholder="••••••••" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -29,6 +29,27 @@ export async function login(formData: TloginFormData) {
   redirect('/profile')
 }
 
+export async function loginWithGoogle() {
+  const supabase = createClient()
+  const origin = getOrigin()
+
+  // Start the Google sign-in process
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/callback`
+    },
+  });
+
+  if (error) {
+    return { error: `Google sign-in failed: ${error.message}` }
+  }
+  console.log('data.url:', data.url)
+
+  // redirect URL for Google login
+  return redirect(data.url)
+}
+
 export async function signup(formData: TsignupFormData) {
   const { email, password, fullName, phoneCountryCode, phoneNumber } = formData
   const supabase = createClient()
@@ -73,8 +94,7 @@ export async function signup(formData: TsignupFormData) {
       profileData.phone_number = phoneNumber
       profileData.phone_country_code = phoneCountryCode
     }
-
-    if (fullName || phoneNumber) {
+    if (Object.keys(profileData).length > 0) {
       // Update the profile with additional information (full_name, phone, etc.)
       await prisma.profile.update({
         where: { id: userId },  // Match the profile by Supabase user ID

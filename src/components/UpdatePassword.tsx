@@ -87,7 +87,7 @@ export function UpdatePassword({ authData }: { authData: any }) {
                     <FormItem>
                       <FormLabel>Current Password</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="Enter current password" />
+                        <Input {...field} type="password" placeholder="••••••••" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -100,7 +100,7 @@ export function UpdatePassword({ authData }: { authData: any }) {
                     <FormItem>
                       <FormLabel>New Password</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="Enter new password" />
+                        <Input {...field} type="password" placeholder="••••••••" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -113,7 +113,7 @@ export function UpdatePassword({ authData }: { authData: any }) {
                     <FormItem>
                       <FormLabel>Confirm New Password</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="Confirm new password" />
+                        <Input {...field} type="password" placeholder="••••••••" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -77,7 +77,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Email" {...field} />
+                      <Input placeholder="you@example.com" {...field} />
                     </FormControl>
                     {/* <FormDescription>
                       This is your email address.
@@ -93,7 +93,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="Password" type="password" {...field} />
+                      <Input placeholder="••••••••" type="password" {...field} />
                     </FormControl>
                     {/* <FormDescription>
                       This is your password.
@@ -109,7 +109,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="Confirm Password" type="password" {...field} />
+                      <Input placeholder="••••••••" type="password" {...field} />
                     </FormControl>
                     {/* <FormDescription>
                       This is your password.
@@ -170,7 +170,7 @@ export default function SignupPage() {
                           <Input
                             className="flex-1"
                             type="tel"
-                            placeholder="123456789"
+                            placeholder="1234567890"
                             {...field}
                           />
                         </FormControl>

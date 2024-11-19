@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, Settings, Shield, User, Bell } from "lucide-react"
+import { LogOut, Settings, Shield, User, Bell, Key } from "lucide-react"
 import { signOut } from "@/app/actions"
 
 export default function UserMenu({ authData, profile }: { authData: any, profile: any }) {
@@ -53,7 +53,7 @@ export default function UserMenu({ authData, profile }: { authData: any, profile
           {profile.role === "ADMIN" && (
             <DropdownMenuItem asChild>
               <Link href="/admin">
-                <Shield className="mr-2 h-4 w-4" />
+                <Key className="mr-2 h-4 w-4" />
                 <span>Admin Panel</span>
               </Link>
             </DropdownMenuItem>
