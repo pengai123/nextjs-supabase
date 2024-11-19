@@ -200,7 +200,7 @@ export default function UserProfile({ user: { authData, profile } }: { user: { a
                                     <Input
                                       className="pl-9"
                                       type="tel"
-                                      placeholder="(123) 456-7890"
+                                      placeholder="1234567890"
                                       {...field}
                                     />
                                   </div>
