@@ -82,12 +82,12 @@ export default function Footer() {
       <div className="container mx-auto">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
           <div className="flex gap-8 flex-col items-start">
-            <div className="flex gap-2 flex-col">
+            <div className="flex gap-2 flex-col items-start">
               {/* <h2 className="text-2xl md:text-4xl tracking-tighter max-w-xl font-regular text-left">
                 Hotlink Studio
               </h2> */}
-              <Link href="/">
-                <Image src="/logo.png" alt="logo" width={100} height={100} />
+              <Link href="/" className="inline-block w-[100px] h-[45px]">
+                <Image src="/logo.png" alt="logo" width={100} height={100} className="w-full h-full" priority />
               </Link>
               <p className="max-w-lg leading-relaxed tracking-tight text-background/65 text-left">
                 Connect you to the web, one hotlink at a time.
