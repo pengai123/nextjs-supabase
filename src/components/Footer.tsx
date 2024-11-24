@@ -86,8 +86,8 @@ export default function Footer() {
               {/* <h2 className="text-2xl md:text-4xl tracking-tighter max-w-xl font-regular text-left">
                 Hotlink Studio
               </h2> */}
-              <Link href="/" className="inline-block w-[100px] h-[45px]">
-                <Image src="/logo.png" alt="logo" width={100} height={100} className="w-full h-full" priority />
+              <Link href="/" className="inline-block w-[100px] h-[45px] relative">
+                <Image src="/logo.png" alt="logo" fill sizes="100%" className="object-contain" priority />
               </Link>
               <p className="max-w-lg leading-relaxed tracking-tight text-background/65 text-left">
                 Connect you to the web, one hotlink at a time.

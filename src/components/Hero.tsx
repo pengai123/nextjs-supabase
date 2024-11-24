@@ -35,13 +35,14 @@ export default function Hero() {
             </Button>
           </div>
         </div>
-        <div className="rounded-md overflow-hidden aspect-square relative w-full max-w-[600px]">
+        <div className="rounded-md overflow-hidden relative w-full max-w-[600px] aspect-square">
           <Image
             src="/hero.jpg"
             alt="hero"
             fill
-            style={{ objectFit: "cover" }}
             sizes="100%"
+            className="object-cover"
+            priority
           />
         </div>
       </div>

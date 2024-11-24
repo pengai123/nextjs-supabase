@@ -54,8 +54,8 @@ export default function Services() {
                         src={svc.image}
                         alt="hero"
                         fill
-                        style={{ objectFit: "cover" }}
                         sizes="100%"
+                        className="object-cover"
                       />
                     </div>
                     <h3 className="text-xl tracking-tight">{svc.title}</h3>

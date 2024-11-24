@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Hotlink Studio",
+  title: "Hotlink Studio - Connect you to the web, one hotlink at a time.",
   description: "Connect you to the web, one hotlink at a time.",
 };
 
