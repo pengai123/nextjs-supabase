@@ -345,9 +345,10 @@ export async function submitContactMessage(msgBody: { name: string, company?: st
       from: `"Hotlink Studio" <${process.env.HLS_CONTACT_EMAIL}>`,
       to: process.env.HLS_CONTACT_EMAIL,
       replyTo: email,
-      subject: 'New Contact Message from Hotlink Studio', // Subject line
+      subject: `New message from ${name} via Hotlink Studio`,
+
       html: `
-        <h1>New Message from Hotlink Studio Contact Page</h1>
+        <h1>New message from ${name} via Hotlink Studio</h1>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Company:</strong> ${company}</p>
         <p><strong>Email:</strong> ${email}</p>
