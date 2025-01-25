@@ -7,8 +7,8 @@ import About from '@/components/About'
 
 const services = [
   {
-    title: "Website Developemnt",
-    description: "Streamline your online presence with cutting-edge web development. At Hotlink Studio, we design responsive, high-performance websites tailored to meet your business needs",
+    title: "Web Design & Development",
+    description: "Streamline your online presence with cutting-edge web development. At Hotlink Studio, we design responsive, high-performance websites tailored to meet your business needs.",
     image: "/webdev.jpg"
   },
   {
@@ -52,10 +52,11 @@ export default function Services() {
                     <div className="bg-muted rounded-md overflow-hidden aspect-video relative w-full">
                       <Image
                         src={svc.image}
-                        alt="hero"
+                        alt={svc.title}
                         fill
                         sizes="100%"
                         className="object-cover"
+                        loading="lazy"
                       />
                     </div>
                     <h3 className="text-xl tracking-tight">{svc.title}</h3>

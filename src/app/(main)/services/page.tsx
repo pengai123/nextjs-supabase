@@ -6,3 +6,8 @@ export default function page() {
     </main>
   )
 }
+
+export const metadata = {
+  title: 'Our Services - Hotlink Studio',
+  description: 'Professional web development, hosting, and domain services to help your business succeed online.',
+}

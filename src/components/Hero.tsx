@@ -42,7 +42,6 @@ export default function Hero() {
             fill
             sizes="100%"
             className="object-cover"
-            priority
           />
         </div>
       </div>

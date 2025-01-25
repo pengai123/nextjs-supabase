@@ -30,7 +30,7 @@ export default function AboutTitle() {
           <motion.span
             key={index}
             className="absolute font-semibold"
-            initial={{ opacity: 0, y: "-100" }}
+            initial={{ opacity: 0, y: "-100px" }}
             transition={{ type: "spring", stiffness: 50 }}
             animate={
               titleNumber === index
@@ -39,7 +39,7 @@ export default function AboutTitle() {
                   opacity: 1,
                 }
                 : {
-                  y: titleNumber > index ? -150 : 150,
+                  y: titleNumber > index ? "-150px" : "150px",
                   opacity: 0,
                 }
             }

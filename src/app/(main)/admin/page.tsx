@@ -20,15 +20,15 @@ export const metadata: Metadata = {
 }
 
 export default async function Dashboard() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { authData, profile, error } = await getUserData()
   const users = await prisma.profile.findMany()
 
   if (error) {
     return (
-      <div className="container py-10 text-center">
-        <h1 className="text-2xl text-red-500">Error loading dashboard</h1>
-        <p>{error}</p>
+      <div className="container py-20 text-center">
+        <h1 className="text-3xl font-bold text-red-500">Error loading dashboard</h1>
+        <p className="mt-4 text-gray-600">{error}</p>
       </div>
     )
   }
@@ -39,66 +39,73 @@ export default async function Dashboard() {
 
   return (
     <main className='flex-1'>
-      <div className='container py-10 '>
-        <h1 className="text-2xl text-center mb-14">Admin Dashboard</h1>
+      <div className='container py-12 max-w-7xl mx-auto'>
+        <h1 className="text-3xl font-bold text-center mb-16">Admin Dashboard</h1>
 
-        <div className="mb-10">
-          <h2 className="text-lg mb-4">Admin Information</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Full Name</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead className="text-right">Website</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>{profile?.email}</TableCell>
-                <TableCell>{profile?.role}</TableCell>
-                <TableCell>{profile?.phone_number ? `+${profile?.phone_country_code} ${profile?.phone_number}` : ""}</TableCell>
-                <TableCell>{profile?.full_name}</TableCell>
-                <TableCell>{profile?.company}</TableCell>
-                <TableCell className="text-right">{profile?.website}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
+        <div className="space-y-12">
+          <section className="rounded-lg border shadow-sm p-6">
+            <h2 className="text-xl font-semibold mb-6">Admin Information</h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Full Name</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead className="text-right">Website</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">{profile?.email}</TableCell>
+                  <TableCell><span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-sm">{profile?.role}</span></TableCell>
+                  <TableCell>{profile?.phone_number ? `+${profile?.phone_country_code} ${profile?.phone_number}` : "—"}</TableCell>
+                  <TableCell>{profile?.full_name || "—"}</TableCell>
+                  <TableCell>{profile?.company || "—"}</TableCell>
+                  <TableCell className="text-right">{profile?.website || "—"}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </section>
 
-        <h2 className="text-lg">User list</h2>
-        <div className='mt-5'>
-          <Table>
-            <TableCaption>All users.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className='min-w-[320px]'>ID</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead >Phone</TableHead>
-                <TableHead >Full Name</TableHead>
-                <TableHead >Company</TableHead>
-                <TableHead className="text-right">Website</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {
-                users.map((user) => (
+          <section className="rounded-lg border shadow-sm p-6">
+            <h2 className="text-xl font-semibold mb-6">User List</h2>
+            <Table>
+              <TableCaption>A list of all registered users in the system.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[280px]">ID</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Full Name</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead className="text-right">Website</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell>{user.id}</TableCell>
+                    <TableCell className="font-mono text-sm">{user.id}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.phone_number ? `+${user.phone_country_code} ${user.phone_number}` : ""}</TableCell>
-                    <TableCell>{user.full_name}</TableCell>
-                    <TableCell>{user.company}</TableCell>
-                    <TableCell className="text-right">{user.website}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-sm ${user.role === 'ADMIN'
+                        ? 'bg-primary/10 text-primary'
+                        : 'bg-muted text-muted-foreground'
+                        }`}>
+                        {user.role}
+                      </span>
+                    </TableCell>
+                    <TableCell>{user.phone_number ? `+${user.phone_country_code} ${user.phone_number}` : "—"}</TableCell>
+                    <TableCell>{user.full_name || "—"}</TableCell>
+                    <TableCell>{user.company || "—"}</TableCell>
+                    <TableCell className="text-right">{user.website || "—"}</TableCell>
                   </TableRow>
-                ))
-              }
-            </TableBody>
-          </Table>
+                ))}
+              </TableBody>
+            </Table>
+          </section>
         </div>
       </div>
     </main>

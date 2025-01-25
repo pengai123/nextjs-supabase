@@ -8,8 +8,8 @@ import { prisma } from '@/lib/prisma'
 import { headers } from 'next/headers'
 const nodemailer = require('nodemailer')
 
-function getOrigin() {
-  const headersList = headers()
+async function getOrigin() {
+  const headersList = await headers()
   const host = headersList.get('host')
   const protocol = headersList.get('x-forwarded-proto') || 'http' // Use https in production if set by your reverse proxy
   const origin = `${protocol}://${host}`
@@ -17,7 +17,7 @@ function getOrigin() {
 }
 
 export async function login(formData: TloginFormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
   console.log('formData:', formData)
   const { data, error } = await supabase.auth.signInWithPassword(formData)
 
@@ -30,8 +30,8 @@ export async function login(formData: TloginFormData) {
 }
 
 export async function loginWithGoogle() {
-  const supabase = createClient()
-  const origin = getOrigin()
+  const supabase = await createClient()
+  const origin = await getOrigin()
 
   // Start the Google sign-in process
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -55,8 +55,8 @@ export async function loginWithGoogle() {
 
 export async function signup(formData: TsignupFormData) {
   const { email, password, fullName, phoneCountryCode, phoneNumber } = formData
-  const supabase = createClient()
-  const origin = getOrigin()
+  const supabase = await createClient()
+  const origin = await getOrigin()
   const redirectTo = `${origin}/profile`
   try {
     // Check if a profile with this email already exists
@@ -115,12 +115,12 @@ export async function signup(formData: TsignupFormData) {
 
 export async function updateEmail(formData: TupdateEmailFormData) {
   //Get origin
-  const origin = getOrigin()
+  const origin = await getOrigin()
   console.log('origin:', origin)
 
   const { currentEmail, newEmail, password } = formData
   console.log('update email formData:', formData)
-  const supabase = createClient()
+  const supabase = await createClient()
 
   //Authenticate the user with their current email and password
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -148,7 +148,7 @@ export async function updateEmail(formData: TupdateEmailFormData) {
 
 export async function updateAccountPassword({ email, formData }: { email: string, formData: TupdatePasswordFormData }) {
   //Get origin
-  const headersList = headers()
+  const headersList = await headers()
   const host = headersList.get('host')
   const protocol = headersList.get('x-forwarded-proto') || 'http' // Use https in production if set by your reverse proxy
   const origin = `${protocol}://${host}`
@@ -157,7 +157,7 @@ export async function updateAccountPassword({ email, formData }: { email: string
 
   const { currentPassword, newPassword } = formData
   console.log('update password formData:', formData)
-  const supabase = createClient()
+  const supabase = await createClient()
 
   //Authenticate the user with their current email and password
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -218,7 +218,7 @@ export async function updateProfile(formData: TprofileFormData) {
 }
 
 export async function signOut() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { error } = await supabase.auth.signOut()
 
   if (error) {
@@ -232,7 +232,7 @@ export async function signOut() {
 }
 
 export async function forgotPasswordForEmail(email: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const user = await prisma.profile.findUnique({
     where: { email }
   })
@@ -254,7 +254,7 @@ export async function forgotPasswordForEmail(email: string) {
 }
 
 export async function updatePassword(newPwd: { password: string }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { error } = await supabase.auth.updateUser(newPwd)
 
   if (error) {
@@ -267,7 +267,7 @@ export async function updatePassword(newPwd: { password: string }) {
 }
 
 export async function deleteAccount(confirmation: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   if (confirmation !== "DELETE") {
     return { error: "Please type DELETE to confirm the deletion of your account." }
@@ -294,7 +294,7 @@ export async function deleteAccount(confirmation: string) {
 }
 
 export async function getAuthData() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
 
   if (error || !data?.user) {
@@ -304,7 +304,7 @@ export async function getAuthData() {
 }
 
 export async function getUserData() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
 
   if (error || !data.user) {

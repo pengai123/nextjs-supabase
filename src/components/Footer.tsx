@@ -87,7 +87,7 @@ export default function Footer() {
                 Hotlink Studio
               </h2> */}
               <Link href="/" className="inline-block w-[100px] h-[45px] relative">
-                <Image src="/logo.png" alt="logo" fill sizes="100%" className="object-contain" priority />
+                <Image src="/logo.png" alt="logo" fill sizes="100%" className="object-contain" />
               </Link>
               <p className="max-w-lg leading-relaxed tracking-tight text-background/65 text-left">
                 Connect you to the web, one hotlink at a time.
