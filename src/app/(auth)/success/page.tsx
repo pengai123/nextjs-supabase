@@ -3,8 +3,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { CircleCheck, Mail, LockKeyhole } from "lucide-react"
 
-export default function Page({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-  const from = searchParams.from
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+export default async function Page({ searchParams }: { searchParams: SearchParams }) {
+  const { from } = await searchParams
   const message = {
     isValid: false,
     title: "",
