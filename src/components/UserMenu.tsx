@@ -19,9 +19,12 @@ export default function UserMenu({ authData, profile }: { authData: any, profile
 
   const handleLogout = async () => {
     try {
-      await signOut()
+      const result = await signOut()
+      if (!result.success) {
+        console.error(result.message)
+      }
     } catch (error) {
-      console.error(error)
+      console.error("Failed to sign out:", error)
     }
   }
 

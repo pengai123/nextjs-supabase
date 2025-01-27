@@ -52,8 +52,8 @@ export default function SignupPage() {
     setErrorMsg("")
     try {
       const res = await signup(values)
-      if (res?.error) {
-        setErrorMsg(res.error)
+      if (!res.success) {
+        setErrorMsg(res.message)
       }
     } catch (error: any) {
       setErrorMsg(error.message)

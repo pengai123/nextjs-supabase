@@ -29,11 +29,11 @@ export function DeleteAccount({ authData }: { authData: any }) {
       const result = await deleteAccount(confirmation);
       console.log('result:', result)
 
-      if (result.error) {
+      if (!result.success) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: result.error,
+          description: result.message,
         });
         return;
       }

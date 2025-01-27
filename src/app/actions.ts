@@ -8,6 +8,11 @@ import { prisma } from '@/lib/prisma'
 import { headers } from 'next/headers'
 const nodemailer = require('nodemailer')
 
+type ActionResponse = {
+  success: boolean;
+  message: string;
+}
+
 async function getOrigin() {
   const headersList = await headers()
   const host = headersList.get('host')
@@ -16,20 +21,24 @@ async function getOrigin() {
   return origin
 }
 
-export async function login(formData: TloginFormData) {
+export async function login(formData: TloginFormData): Promise<ActionResponse> {
   const supabase = await createClient()
   console.log('formData:', formData)
   const { data, error } = await supabase.auth.signInWithPassword(formData)
 
   if (error || !data.user) {
-    return { error: "Invalid email or password." }
+    return {
+      success: false,
+      message: "Invalid email or password."
+    }
   }
 
   revalidatePath('/', 'layout')
   redirect('/profile')
+  return { success: true, message: "Login successful" }
 }
 
-export async function loginWithGoogle() {
+export async function loginWithGoogle(): Promise<ActionResponse> {
   const supabase = await createClient()
   const origin = await getOrigin()
 
@@ -45,15 +54,17 @@ export async function loginWithGoogle() {
   });
 
   if (error) {
-    return { error: `Google sign-in failed: ${error.message}` }
+    return {
+      success: false,
+      message: `Google sign-in failed: ${error.message}`
+    }
   }
-  console.log('data.url:', data.url)
 
-  // redirect URL for Google login
-  return redirect(data.url)
+  redirect(data.url)
+  return { success: true, message: "Redirecting to Google login" }
 }
 
-export async function signup(formData: TsignupFormData) {
+export async function signup(formData: TsignupFormData): Promise<ActionResponse> {
   const { email, password, fullName, phoneCountryCode, phoneNumber } = formData
   const supabase = await createClient()
   const origin = await getOrigin()
@@ -67,7 +78,10 @@ export async function signup(formData: TsignupFormData) {
     console.log('existingUser:', existingUser)
 
     if (existingUser) {
-      return { error: "This account already exists." }
+      return {
+        success: false,
+        message: "This account already exists."
+      }
     }
 
     // Create new user in Supabase Auth
@@ -81,7 +95,10 @@ export async function signup(formData: TsignupFormData) {
 
     if (error || !data.user) {
       console.log('signup error:', error)
-      return { error: error?.message }
+      return {
+        success: false,
+        message: error?.message || "Signup failed"
+      }
     }
 
     // Get the new user's ID from Supabase
@@ -106,14 +123,17 @@ export async function signup(formData: TsignupFormData) {
     }
   } catch (error: any) {
     console.log('error:', error.message)
-    return { error: "An unexpected error occurred. Please try again." }
+    return {
+      success: false,
+      message: "An unexpected error occurred. Please try again."
+    }
   }
   //Redirect to success page
   revalidatePath('/', 'layout')
   redirect('/success?from=signup')
 }
 
-export async function updateEmail(formData: TupdateEmailFormData) {
+export async function updateEmail(formData: TupdateEmailFormData): Promise<ActionResponse> {
   //Get origin
   const origin = await getOrigin()
   console.log('origin:', origin)
@@ -129,7 +149,10 @@ export async function updateEmail(formData: TupdateEmailFormData) {
   })
 
   if (signInError || !signInData.user) {
-    return { error: "Invalid email or password." };
+    return {
+      success: false,
+      message: "Invalid email or password."
+    }
   }
 
   // Update the user's email with Supabase auth
@@ -140,18 +163,17 @@ export async function updateEmail(formData: TupdateEmailFormData) {
   });
 
   if (updateError) {
-    return { error: "Failed to update email. Please try again." };
+    return {
+      success: false,
+      message: "Failed to update email. Please try again."
+    }
   }
   revalidatePath('/', 'layout')
   return { success: true, message: "We've sent a confirmation email to your new email address. Please check your inbox and follow the link to confirm the change and complete the update." }
 }
 
-export async function updateAccountPassword({ email, formData }: { email: string, formData: TupdatePasswordFormData }) {
-  //Get origin
-  const headersList = await headers()
-  const host = headersList.get('host')
-  const protocol = headersList.get('x-forwarded-proto') || 'http' // Use https in production if set by your reverse proxy
-  const origin = `${protocol}://${host}`
+export async function updateAccountPassword({ email, formData }: { email: string, formData: TupdatePasswordFormData }): Promise<ActionResponse> {
+  const origin = await getOrigin()
 
   console.log('origin:', origin)
 
@@ -166,7 +188,10 @@ export async function updateAccountPassword({ email, formData }: { email: string
   })
 
   if (signInError || !signInData.user) {
-    return { error: "Invalid email or password." };
+    return {
+      success: false,
+      message: "Invalid email or password."
+    }
   }
 
   // Update the user's password with Supabase auth
@@ -175,20 +200,26 @@ export async function updateAccountPassword({ email, formData }: { email: string
   });
 
   if (updateError) {
-    return { error: "Failed to update password. Please try again." };
+    return {
+      success: false,
+      message: "Failed to update password. Please try again."
+    }
   }
 
   return { success: true, message: "Your password has been successfully updated. You can now log in with your new password." }
 }
 
-export async function updateProfile(formData: TprofileFormData) {
+export async function updateProfile(formData: TprofileFormData): Promise<ActionResponse> {
   const { fullName, phoneCountryCode, phoneNumber, company, website } = formData
 
   try {
     // Get the current user's ID from Supabase Auth
     const { authData, profile, error } = await getUserData()
     if (error) {
-      return { error: "Failed to fetch user information." }
+      return {
+        success: false,
+        message: "Failed to fetch user information."
+      }
     }
 
     // Check for changes, update profile table
@@ -213,25 +244,35 @@ export async function updateProfile(formData: TprofileFormData) {
       return { success: true, message: "No changes detected" };
     }
   } catch (error: any) {
-    return { error: "An unexpected error occurred. Please try again." };
+    return {
+      success: false,
+      message: "An unexpected error occurred. Please try again."
+    }
   }
 }
 
-export async function signOut() {
+export async function signOut(): Promise<ActionResponse> {
   const supabase = await createClient()
   const { error } = await supabase.auth.signOut()
 
   if (error) {
     console.log('error:', error?.message)
     redirect('/error')
-    return
+    return {
+      success: false,
+      message: "Failed to sign out. Please try again later."
+    }
   }
 
   revalidatePath('/', 'layout')
   redirect('/')
+  return {
+    success: true,
+    message: "You have been successfully signed out."
+  }
 }
 
-export async function forgotPasswordForEmail(email: string) {
+export async function forgotPasswordForEmail(email: string): Promise<ActionResponse> {
   const supabase = await createClient()
   const user = await prisma.profile.findUnique({
     where: { email }
@@ -240,95 +281,123 @@ export async function forgotPasswordForEmail(email: string) {
   console.log('user:', user)
 
   if (!user) {
-    return { error: "This account does not exist." }
+    return {
+      success: false,
+      message: "This account does not exist."
+    }
   }
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email)
 
   if (error) {
     console.log('error:', error)
-    return { error: error.message }
+    return {
+      success: false,
+      message: error.message
+    }
   }
   revalidatePath('/', 'layout')
   redirect('/success?from=forgotpassword')
 }
 
-export async function updatePassword(newPwd: { password: string }) {
+export async function updatePassword(newPwd: { password: string }): Promise<ActionResponse> {
   const supabase = await createClient()
   const { error } = await supabase.auth.updateUser(newPwd)
 
   if (error) {
-    console.log('error:', error.message)
-    return { error: error.message }
+    return {
+      success: false,
+      message: error.message
+    }
   }
 
   revalidatePath('/', 'layout')
   redirect('/success?from=updatepassword')
+  return { success: true, message: "Password updated successfully" }
 }
 
-export async function deleteAccount(confirmation: string) {
+export async function deleteAccount(confirmation: string): Promise<ActionResponse> {
   const supabase = await createClient()
 
   if (confirmation !== "DELETE") {
-    return { error: "Please type DELETE to confirm the deletion of your account." }
+    return {
+      success: false,
+      message: "Please type DELETE to confirm the deletion of your account."
+    }
   }
 
   try {
     const { data, error } = await supabase.auth.getUser()
 
     if (error || !data.user) {
-      return { error: "User is not logged in." }
+      return {
+        success: false,
+        message: "User is not logged in."
+      }
     }
 
     // Delete the currently authenticated user from the auth.users table
     const { error: deleteAuthError } = await supabase.rpc("delete_user")
     if (deleteAuthError) {
-      return { error: `Failed to delete user from Auth: ${deleteAuthError.message}` }
+      return {
+        success: false,
+        message: `Failed to delete user from Auth: ${deleteAuthError.message}`
+      }
     }
 
     revalidatePath('/', 'layout')
-    return { success: true, message: 'Account deleted successfully.' }
-  } catch (error: any) {
-    return { success: false, message: `Error deleting account: ${error.message}` }
-  }
-}
-
-export async function getAuthData() {
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-
-  if (error || !data?.user) {
-    return { error: "User is not logged in." }
-  }
-  return { authData: data.user }
-}
-
-export async function getUserData() {
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-
-  if (error || !data.user) {
-    return { error: "User is not logged in." }
-  }
-
-  // Get the user's ID from Supabase
-  const userId = data?.user?.id;
-  try {
-    // Fetch the profile from Prisma using the user's ID
-    const profile = await prisma.profile.findUnique({
-      where: { id: userId },  // Match the profile by Supabase user ID
-    })
-    if (!profile) {
-      return { error: "Profile not found for the user." };
+    return {
+      success: true,
+      message: "Account successfully deleted"
     }
+  } catch (error: any) {
+    return {
+      success: false,
+      message: "Failed to delete account: " + error.message
+    }
+  }
+}
+
+export async function getAuthData(): Promise<{ error?: string; authData?: any }> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error || !data?.user) {
+      return { error: "User is not logged in." }
+    }
+    return { authData: data.user }
+  } catch (error) {
+    return { error: "Failed to get auth data." }
+  }
+}
+
+export async function getUserData(): Promise<{ error?: string; authData?: any; profile?: any }> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error || !data?.user) {
+      return { error: "User is not logged in." }
+    }
+
+    const userId = data.user.id
+    const profile = await prisma.profile.findUnique({
+      where: { id: userId },
+    })
+
+    if (!profile) {
+      return { error: "Profile not found for the user." }
+    }
+
     return { authData: data.user, profile }
   } catch (error) {
+    console.error("Error getting user data:", error)
     return { error: "An unexpected error occurred. Please try again." }
   }
 }
 
-
-export async function submitContactMessage(msgBody: { name: string, company?: string, email: string, message: string }) {
+export async function submitContactMessage(msgBody: { name: string, company?: string, email: string, message: string }): Promise<ActionResponse> {
   const { name, company, email, message } = msgBody
   const transporter = nodemailer.createTransport({
     host: 'smtp.zoho.com', // Change this based on the SMTP service you're using (e.g., smtp.gmail.com for Gmail)
@@ -358,9 +427,14 @@ export async function submitContactMessage(msgBody: { name: string, company?: st
 
     // 4. Send email
     await transporter.sendMail(mailOptions)
-    return { success: 'Message sent successfully!' }
+    return {
+      success: true,
+      message: 'Message sent successfully!'
+    }
   } catch (error: any) {
-    console.log(error.message)
-    return { error: 'Something went wrong while sending the message.' }
+    return {
+      success: false,
+      message: 'Something went wrong while sending the message.'
+    }
   }
 }

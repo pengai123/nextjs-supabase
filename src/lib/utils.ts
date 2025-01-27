@@ -6,18 +6,35 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPhoneNumber(phoneNumber: string): string {
+  // Handle null, undefined, or empty string
+  if (!phoneNumber) return '';
+
   // Remove all non-digit characters
   const cleaned = phoneNumber.replace(/\D/g, '');
 
-  // Format as (XXX) XXX-XXXX
-  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-
-  if (match) {
-    return `(${match[1]}) ${match[2]}-${match[3]}`;
+  // Handle different length phone numbers
+  if (cleaned.length === 10) {
+    // Format as (XXX) XXX-XXXX for 10 digit numbers
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `(${match[1]}) ${match[2]}-${match[3]}`;
+    }
+  } else if (cleaned.length === 7) {
+    // Format as XXX-XXXX for 7 digit numbers
+    const match = cleaned.match(/^(\d{3})(\d{4})$/);
+    if (match) {
+      return `${match[1]}-${match[2]}`;
+    }
+  } else if (cleaned.length === 11) {
+    // Handle 11 digit numbers - format as XXX XXXX XXXX
+    const match = cleaned.match(/^(\d{3})(\d{4})(\d{4})$/);
+    if (match) {
+      return `${match[1]} ${match[2]} ${match[3]}`;
+    }
   }
 
-  // If the number doesn't match the expected format, return the original number
-  return phoneNumber;
+  // If the number doesn't match any expected format, return cleaned version
+  return cleaned;
 }
 
 // Country codes remain the same

@@ -43,17 +43,14 @@ export default function Contact() {
   const { isSubmitting } = form.formState
   const onSubmit = async (values: TcontactFormData) => {
     setErrorMsg("")
-    // await new Promise((resolve) => setTimeout(resolve, 5000))
-    // console.log("submitted:", values)
-
     try {
       const res = await submitContactMessage(values)
-      if (res.error) {
-        return setErrorMsg(res.error)
+      if (!res.success) {
+        return setErrorMsg(res.message)
       }
       toast({
-        title: "Notification",
-        description: res.success,
+        title: "Success",
+        description: res.message,
         action: (
           <ToastAction altText="Close">Close</ToastAction>
         ),
@@ -78,7 +75,7 @@ export default function Contact() {
                   Get in touch
                 </h4>
                 <p className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-md text-left">
-                  Let’s Build Something Great Together – Website Design, Development, and Hosting Solutions Tailored for You!
+                  Let's Build Something Great Together – Website Design, Development, and Hosting Solutions Tailored for You!
                 </p>
               </div>
             </div>

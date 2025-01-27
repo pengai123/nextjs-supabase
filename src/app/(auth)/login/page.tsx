@@ -39,8 +39,8 @@ export default function LoginPage() {
     setErrorMsg("")
     try {
       const res = await login(values)
-      if (res?.error) {
-        setErrorMsg(res.error)
+      if (!res.success) {
+        setErrorMsg(res.message)
       }
     } catch (error: any) {
       console.error(error)
@@ -49,15 +49,18 @@ export default function LoginPage() {
   }
 
   const handleGoogleLogin = async () => {
-    console.log("google login")
     setIsLoading(true)
     setErrorMsg("")
     try {
-      await loginWithGoogle()
+      const res = await loginWithGoogle()
+      if (!res.success) {
+        setErrorMsg(res.message)
+      }
     } catch (error: any) {
       setErrorMsg(error.message)
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   return (

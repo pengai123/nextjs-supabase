@@ -31,11 +31,11 @@ export function UpdatePassword({ authData }: { authData: any }) {
       const result = await updateAccountPassword({ email: authData.email, formData: data });
       console.log('result:', result)
 
-      if (result.error) {
+      if (!result.success) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: result.error,
+          description: result.message,
         });
         return;
       }

@@ -43,8 +43,8 @@ export default function UpdatePasswordPage() {
     setMessage("")
     try {
       const res = await updatePassword({ password: values.newPassword })
-      if (res?.error) {
-        setMessage(res.error)
+      if (!res.success) {
+        setMessage(res.message)
       }
     } catch (error: any) {
       console.log('error:', error)

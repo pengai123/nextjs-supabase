@@ -1,5 +1,5 @@
 "use client"
-import { User, Shield, Settings, Bell } from "lucide-react"
+import { User, Shield, Settings, Bell, Key } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import Link from 'next/link'
 import {
@@ -14,9 +14,8 @@ import {
   useSidebar
 } from "@/components/ui/sidebar"
 
-
 // Menu items.
-const items = [
+const baseItems = [
   {
     title: "Profile",
     href: "/profile",
@@ -34,8 +33,18 @@ const items = [
   },
 ]
 
-export function SettingsSidebar() {
+export function SettingsSidebar({ isAdmin }: { isAdmin: boolean }) {
   const { setOpenMobile } = useSidebar()
+
+  const items = isAdmin ? [
+    {
+      title: "Admin",
+      href: "/admin",
+      icon: Key,
+    },
+    ...baseItems
+  ] : baseItems
+
   return (
     <Sidebar className="h-full inset-y-auto">
       <SidebarContent>
