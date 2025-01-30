@@ -40,12 +40,13 @@ export default function ForgotPasswordPage() {
 
     try {
       const res = await forgotPasswordForEmail(email)
-      if (!res.success) {
+      if (res && !res.success) {
         setMessage(res.message)
       }
     } catch (error: any) {
-      console.log('error:', error.message)
-      setMessage(error.message)
+      if (!error.message?.includes('NEXT_REDIRECT')) {
+        setMessage(error.message)
+      }
     }
   }
 

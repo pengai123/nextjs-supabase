@@ -21,6 +21,7 @@ async function getOrigin() {
   return origin
 }
 
+
 export async function login(formData: TloginFormData): Promise<ActionResponse> {
   const supabase = await createClient()
   console.log('formData:', formData)
@@ -33,7 +34,6 @@ export async function login(formData: TloginFormData): Promise<ActionResponse> {
     }
   }
 
-  revalidatePath('/', 'layout')
   redirect('/profile')
   return { success: true, message: "Login successful" }
 }
@@ -42,7 +42,6 @@ export async function loginWithGoogle(): Promise<ActionResponse> {
   const supabase = await createClient()
   const origin = await getOrigin()
 
-  // Start the Google sign-in process
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -60,77 +59,70 @@ export async function loginWithGoogle(): Promise<ActionResponse> {
     }
   }
 
+  if (!data?.url) {
+    return {
+      success: false,
+      message: "Failed to get Google authentication URL"
+    }
+  }
+
+  // Perform redirect OUTSIDE of try/catch
   redirect(data.url)
-  return { success: true, message: "Redirecting to Google login" }
+  return { success: true, message: "Redirecting to Google login..." } // This line is never reached
 }
 
 export async function signup(formData: TsignupFormData): Promise<ActionResponse> {
   const { email, password, fullName, phoneCountryCode, phoneNumber } = formData
   const supabase = await createClient()
   const origin = await getOrigin()
-  const redirectTo = `${origin}/profile`
-  try {
-    // Check if a profile with this email already exists
-    const existingUser = await prisma.profile.findUnique({
-      where: { email }
-    })
+  const redirectToURL = `${origin}/profile`
 
-    console.log('existingUser:', existingUser)
+  // Check if a profile with this email already exists
+  const existingUser = await prisma.profile.findUnique({
+    where: { email }
+  })
 
-    if (existingUser) {
-      return {
-        success: false,
-        message: "This account already exists."
-      }
-    }
-
-    // Create new user in Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectTo, // Redirect to "/profile" after confirmation
-      },
-    })
-
-    if (error || !data.user) {
-      console.log('signup error:', error)
-      return {
-        success: false,
-        message: error?.message || "Signup failed"
-      }
-    }
-
-    // Get the new user's ID from Supabase
-    const userId = data.user?.id;
-
-    //Update any filled profile data
-    const profileData: Record<string, any> = {}
-    if (fullName) {
-      profileData.full_name = fullName
-    }
-
-    if (phoneNumber) {
-      profileData.phone_number = phoneNumber
-      profileData.phone_country_code = phoneCountryCode
-    }
-    if (Object.keys(profileData).length > 0) {
-      // Update the profile with additional information (full_name, phone, etc.)
-      await prisma.profile.update({
-        where: { id: userId },  // Match the profile by Supabase user ID
-        data: profileData,
-      });
-    }
-  } catch (error: any) {
-    console.log('error:', error.message)
+  if (existingUser) {
     return {
       success: false,
-      message: "An unexpected error occurred. Please try again."
+      message: "This account already exists."
     }
   }
-  //Redirect to success page
-  revalidatePath('/', 'layout')
-  redirect('/success?from=signup')
+
+  // Create new user in Supabase Auth
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectToURL,
+    },
+  })
+
+  if (error || !data.user) {
+    return {
+      success: false,
+      message: error?.message || "Signup failed"
+    }
+  }
+
+  // Update any filled profile data
+  const profileData: Record<string, any> = {}
+  if (fullName) profileData.full_name = fullName
+  if (phoneNumber) {
+    profileData.phone_number = phoneNumber
+    profileData.phone_country_code = phoneCountryCode
+  }
+
+  if (Object.keys(profileData).length > 0) {
+    await prisma.profile.update({
+      where: { id: data.user.id },
+      data: profileData,
+    })
+  }
+
+  // Redirect after all operations
+  await redirectTo('/success?from=signup')
+  return { success: true, message: "Signup successful" } // Never reached
 }
 
 export async function updateEmail(formData: TupdateEmailFormData): Promise<ActionResponse> {
@@ -256,16 +248,14 @@ export async function signOut(): Promise<ActionResponse> {
   const { error } = await supabase.auth.signOut()
 
   if (error) {
-    console.log('error:', error?.message)
-    redirect('/error')
     return {
       success: false,
       message: "Failed to sign out. Please try again later."
     }
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  // Perform redirect after successful logout
+  await redirectTo('/')
   return {
     success: true,
     message: "You have been successfully signed out."
@@ -296,8 +286,8 @@ export async function forgotPasswordForEmail(email: string): Promise<ActionRespo
       message: error.message
     }
   }
-  revalidatePath('/', 'layout')
-  redirect('/success?from=forgotpassword')
+  await redirectTo('/success?from=forgotpassword')
+  return { success: true, message: "Password reset email sent" }
 }
 
 export async function updatePassword(newPwd: { password: string }): Promise<ActionResponse> {
@@ -311,8 +301,7 @@ export async function updatePassword(newPwd: { password: string }): Promise<Acti
     }
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/success?from=updatepassword')
+  await redirectTo('/success?from=updatepassword')
   return { success: true, message: "Password updated successfully" }
 }
 
@@ -437,4 +426,11 @@ export async function submitContactMessage(msgBody: { name: string, company?: st
       message: 'Something went wrong while sending the message.'
     }
   }
+}
+
+export async function redirectTo(path: string): Promise<void> {
+  // Revalidate the layout to ensure fresh data
+  revalidatePath('/', 'layout')
+  // Perform the redirect
+  redirect(path)
 }

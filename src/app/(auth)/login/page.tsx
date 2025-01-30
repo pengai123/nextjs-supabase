@@ -1,5 +1,5 @@
 "use client"
-import { login, loginWithGoogle } from '@/app/actions'
+import { login, loginWithGoogle, redirectTo } from '@/app/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { loginFormSchema, TloginFormData } from "@/lib/zodSchemas"
@@ -40,24 +40,30 @@ export default function LoginPage() {
     try {
       const res = await login(values)
       if (!res.success) {
-        setErrorMsg(res.message)
+        return setErrorMsg(res.message)
       }
     } catch (error: any) {
-      console.error(error)
-      setErrorMsg("An unexpected error occurred. Please try again.")
+      if (!error.message?.includes('NEXT_REDIRECT')) {
+        return setErrorMsg(error.message || "An unexpected error occurred. Please try again.")
+      }
     }
   }
+
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     setErrorMsg("")
     try {
-      const res = await loginWithGoogle()
-      if (!res.success) {
-        setErrorMsg(res.message)
+      const result = await loginWithGoogle()
+      // If we get a result, it means there was an error (success case redirects)
+      if (result && !result.success) {
+        setErrorMsg(result.message)
       }
     } catch (error: any) {
-      setErrorMsg(error.message)
+      // Ignore redirect errors
+      if (!error.message?.includes('NEXT_REDIRECT')) {
+        setErrorMsg(error.message || "An error occurred during Google login")
+      }
     } finally {
       setIsLoading(false)
     }

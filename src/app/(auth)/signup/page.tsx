@@ -1,5 +1,5 @@
 "use client"
-import { signup } from '@/app/actions'
+import { redirectTo, signup } from '@/app/actions'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signupFormSchema, TsignupFormData } from "@/lib/zodSchemas"
@@ -48,15 +48,16 @@ export default function SignupPage() {
   })
   const { isSubmitting } = form.formState
   const onSubmit = async (values: TsignupFormData) => {
-    console.log('values:', values)
     setErrorMsg("")
     try {
       const res = await signup(values)
-      if (!res.success) {
+      if (res && !res.success) {
         setErrorMsg(res.message)
       }
     } catch (error: any) {
-      setErrorMsg(error.message)
+      if (!error.message?.includes('NEXT_REDIRECT')) {
+        setErrorMsg(error.message || "An unexpected error occurred")
+      }
     }
   }
 
