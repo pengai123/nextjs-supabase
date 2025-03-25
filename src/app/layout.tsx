@@ -8,9 +8,34 @@ const inter = Inter({
   variable: "--font-inter"
 });
 
+// Use environment-aware base URL
+const baseUrl = process.env.NODE_ENV === 'production'
+  ? 'https://hotlinkstudio.com'
+  : 'http://localhost:3000';
+
 export const metadata = {
   title: "Hotlink Studio - Connect you to the web, one hotlink at a time.",
   description: "Connect you to the web, one hotlink at a time.",
+  metadataBase: new URL(baseUrl),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    title: 'Hotlink Studio - Connect you to the web, one hotlink at a time.',
+    description: 'Connect you to the web, one hotlink at a time.',
+    siteName: 'Hotlink Studio',
+    images: [
+      {
+        url: '/logo2.png',
+        width: 180,
+        height: 74,
+        alt: 'Hotlink Studio',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

@@ -35,9 +35,9 @@ export default function Hero() {
             <h1 className="text-5xl md:text-6xl max-w-xl tracking-tighter text-left font-regular">
               Connect you to the web, one hotlink at a time.
             </h1>
-            <p className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-lg text-left">
+            <h2 className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-lg text-left">
               At Hotlink Studio, we create modern, user-friendly websites and provide fast, reliable hosting. Let us handle your online presence so you can focus on growing your business.
-            </p>
+            </h2>
           </div>
           <div className="flex flex-row gap-4">
             <Button asChild size="lg" className="gap-4" variant="outline">

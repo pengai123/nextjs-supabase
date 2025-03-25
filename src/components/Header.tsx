@@ -20,8 +20,15 @@ export default async function Header() {
   return (
     <div className="sticky top-0 z-50 h-[74px] flex justify-center items-center w-full py-2 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-full max-w-7xl px-2 sm:px-6 flex justify-between items-center">
-        <Link href="/" className="inline-block w-[100px] h-[45px] relative">
-          <Image src="/logo.png" alt="logo" fill sizes="100%" className="object-contain" priority />
+        <Link href="/" className="inline-block w-[120px] h-[48px] relative">
+          <Image
+            src="/logo2.png"
+            alt="logo"
+            fill
+            sizes="(max-width: 768px) 100vw, 120px"
+            className="object-contain"
+            unoptimized
+          />
         </Link>
         <NavLinks navItems={navItems} />
         <div className="flex items-center gap-2">
